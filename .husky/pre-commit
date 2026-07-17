@@ -1,0 +1,1 @@
+pnpm format:check && pnpm -r --if-present lint && pnpm -r --if-present typecheck
