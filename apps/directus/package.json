@@ -8,6 +8,7 @@
     "schema:snapshot": "tsx src/schema/snapshot.ts",
     "permissions:apply": "tsx src/permissions/apply.ts",
     "flows:apply": "tsx src/flows/apply.ts",
+    "recompute-category-paths": "tsx src/taxonomy/recompute-category-paths.ts",
     "seed": "tsx src/seed/index.ts",
     "tenant:clone": "tsx src/tenant-clone/index.ts",
     "lint": "eslint . --max-warnings=0",
