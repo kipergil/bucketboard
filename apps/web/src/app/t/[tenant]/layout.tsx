@@ -42,7 +42,7 @@ export default async function TenantLayout({
   return (
     <TenantProvider tenant={tenantContext}>
       <Header tenant={tenantContext} />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">{children}</main>
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">{children}</main>
       <Footer tenant={tenantContext} />
     </TenantProvider>
   );

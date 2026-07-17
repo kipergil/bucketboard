@@ -99,7 +99,7 @@ export default async function CategoryPage(props: CategoryPageProps) {
       <CategoryBreadcrumb tenantSlug={tenant.slug} segments={segments} />
 
       <div>
-        <h1 className="text-2xl font-bold">{category.name}</h1>
+        <h1 className="font-heading text-2xl font-bold tracking-tight">{category.name}</h1>
         {category.description ? (
           <p className="text-muted-foreground mt-1">{category.description}</p>
         ) : null}

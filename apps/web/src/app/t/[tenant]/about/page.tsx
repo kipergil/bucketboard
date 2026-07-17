@@ -11,7 +11,7 @@ export default async function AboutPage({ params }: { params: Promise<{ tenant: 
 
   return (
     <div className="max-w-2xl space-y-4">
-      <h1 className="text-2xl font-bold">About {tenant.name}</h1>
+      <h1 className="font-heading text-2xl font-bold tracking-tight">About {tenant.name}</h1>
       {tenant.description ? <p className="text-muted-foreground">{tenant.description}</p> : null}
       <p>
         {tenant.name} is a community-driven platform where members submit and rate their favourite

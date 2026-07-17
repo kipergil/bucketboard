@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { ExternalLink } from 'lucide-react';
 import type { ItemOffer, Retailer, RetailerLocation } from '@bucketboard/shared';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { assetUrl } from '@/lib/directus/assets';
 
 function isExpandedRetailer(retailer: ItemOffer['retailer']): retailer is Retailer {
@@ -17,15 +19,15 @@ function OfferRow({ offer, tenantSlug }: { offer: ItemOffer; tenantSlug: string 
   const logo = assetUrl(retailer?.logo, 'thumb');
 
   return (
-    <li className="flex items-center gap-3 rounded-lg border p-3">
-      <div className="bg-muted relative size-10 shrink-0 overflow-hidden rounded-full">
+    <li className="hover:border-primary/30 hover:bg-accent/40 flex items-center gap-3 rounded-xl border p-3 transition-colors">
+      <div className="bg-muted ring-border relative size-10 shrink-0 overflow-hidden rounded-full ring-1">
         {logo ? <Image src={logo} alt="" fill sizes="40px" className="object-cover" /> : null}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <Link
             href={`/t/${tenantSlug}/s/${retailer?.slug ?? ''}`}
-            className="truncate font-medium hover:underline"
+            className="hover:text-primary truncate font-medium transition-colors"
           >
             {retailer?.name ?? 'Retailer'}
           </Link>
@@ -53,14 +55,15 @@ function OfferRow({ offer, tenantSlug }: { offer: ItemOffer; tenantSlug: string 
             }).format(Number(offer.price))}
           </span>
         ) : null}
-        <Link
-          href={`/go/${offer.id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-3 py-1.5 text-sm font-medium"
-        >
-          Buy
-        </Link>
+        <Button
+          size="sm"
+          render={
+            <Link href={`/go/${offer.id}`} target="_blank" rel="noopener noreferrer">
+              Buy
+              <ExternalLink data-icon="inline-end" />
+            </Link>
+          }
+        />
       </div>
     </li>
   );

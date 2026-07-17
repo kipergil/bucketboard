@@ -107,7 +107,7 @@ export default async function ItemPage(props: ItemPageProps) {
           ) : null}
 
           <div>
-            <h1 className="text-2xl font-bold">{item.title}</h1>
+            <h1 className="font-heading text-2xl font-bold tracking-tight">{item.title}</h1>
             {item.brand ? <p className="text-muted-foreground">{item.brand}</p> : null}
           </div>
 
@@ -118,12 +118,14 @@ export default async function ItemPage(props: ItemPageProps) {
           <ReportButton tenantSlug={tenant.slug} targetCollection="items" targetId={item.id} />
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">Where to buy</h2>
+            <h2 className="font-heading mb-3 text-lg font-semibold">Where to buy</h2>
             <OfferList offers={offers} tenantSlug={tenant.slug} />
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">Comments ({item.comment_count})</h2>
+            <h2 className="font-heading mb-3 text-lg font-semibold">
+              Comments ({item.comment_count})
+            </h2>
             <CommentThread tenantSlug={tenant.slug} itemId={item.id} comments={comments} />
           </section>
         </div>

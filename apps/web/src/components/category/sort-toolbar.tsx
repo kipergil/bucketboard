@@ -1,7 +1,15 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { ArrowUpDown } from 'lucide-react';
 import type { ItemSort } from '@bucketboard/shared';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const SORT_OPTIONS: Array<{ value: ItemSort; label: string }> = [
   { value: 'top_all', label: 'Top (all time)' },
@@ -14,7 +22,8 @@ export function SortToolbar({ currentSort }: { currentSort: ItemSort }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  function handleChange(value: string) {
+  function handleChange(value: ItemSort | null) {
+    if (!value) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set('sort', value);
     params.delete('page');
@@ -22,19 +31,18 @@ export function SortToolbar({ currentSort }: { currentSort: ItemSort }) {
   }
 
   return (
-    <label className="flex items-center gap-2 text-sm">
-      <span className="text-muted-foreground">Sort</span>
-      <select
-        value={currentSort}
-        onChange={(e) => handleChange(e.target.value)}
-        className="border-input bg-background h-8 rounded-md border px-2 text-sm"
-      >
+    <Select value={currentSort} onValueChange={handleChange}>
+      <SelectTrigger aria-label="Sort items">
+        <ArrowUpDown className="text-muted-foreground size-3.5" aria-hidden="true" />
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
         {SORT_OPTIONS.map((option) => (
-          <option key={option.value} value={option.value}>
+          <SelectItem key={option.value} value={option.value}>
             {option.label}
-          </option>
+          </SelectItem>
         ))}
-      </select>
-    </label>
+      </SelectContent>
+    </Select>
   );
 }

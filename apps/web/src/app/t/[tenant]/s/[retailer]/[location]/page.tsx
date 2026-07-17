@@ -68,7 +68,7 @@ export default async function StorePage(props: StorePageProps) {
         >
           {retailer.name}
         </Link>
-        <h1 className="text-2xl font-bold">{location.name}</h1>
+        <h1 className="font-heading text-2xl font-bold tracking-tight">{location.name}</h1>
         {location.opening_hours ? (
           <Badge variant={openNow ? 'default' : 'secondary'} className="mt-1">
             {openNow ? 'Open now' : 'Closed now'}

@@ -21,7 +21,7 @@ export default async function SubmitPage({ params }: { params: Promise<{ tenant:
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-bold">Submit an item</h1>
+      <h1 className="font-heading text-2xl font-bold tracking-tight">Submit an item</h1>
 
       <SignedOut>
         <p className="text-muted-foreground">Sign in to submit an item.</p>

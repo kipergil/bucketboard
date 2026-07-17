@@ -4,6 +4,8 @@ import { listRetailers } from '@/services/retailers';
 import { retailerDirectoryQuerySchema, RETAILER_TYPE, RETAILER_KIND } from '@bucketboard/shared';
 import { RetailerCard } from '@/components/retailer/retailer-card';
 import { Pagination } from '@/components/pagination';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = { title: 'Shops' };
 
@@ -43,40 +45,43 @@ export default async function ShopsDirectoryPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Shops</h1>
+      <h1 className="font-heading text-2xl font-bold tracking-tight">Shops</h1>
 
-      <form method="get" className="flex flex-wrap items-end gap-3 text-sm">
-        <label className="flex flex-col gap-1">
-          <span className="text-muted-foreground">Type</span>
+      <form
+        method="get"
+        className="bg-muted/50 flex flex-wrap items-end gap-4 rounded-xl border p-4 text-sm"
+      >
+        <label className="flex flex-col gap-1.5">
+          <span className="text-muted-foreground text-xs font-medium">Type</span>
           <select
             name="type"
             defaultValue={query.type ?? ''}
-            className="border-input bg-background h-9 rounded-md border px-2"
+            className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3 h-9 rounded-lg border px-2.5 capitalize outline-none"
           >
             <option value="">Any</option>
             {RETAILER_TYPE.map((type) => (
-              <option key={type} value={type}>
+              <option key={type} value={type} className="capitalize">
                 {type}
               </option>
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1">
-          <span className="text-muted-foreground">Kind</span>
+        <label className="flex flex-col gap-1.5">
+          <span className="text-muted-foreground text-xs font-medium">Kind</span>
           <select
             name="kind"
             defaultValue={query.kind ?? ''}
-            className="border-input bg-background h-9 rounded-md border px-2"
+            className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3 h-9 rounded-lg border px-2.5 capitalize outline-none"
           >
             <option value="">Any</option>
             {RETAILER_KIND.map((kind) => (
-              <option key={kind} value={kind}>
+              <option key={kind} value={kind} className="capitalize">
                 {kind.replace('_', ' ')}
               </option>
             ))}
           </select>
         </label>
-        <button type="submit" className="bg-primary text-primary-foreground h-9 rounded-md px-3">
+        <button type="submit" className={cn(buttonVariants({ size: 'default' }))}>
           Filter
         </button>
       </form>
