@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { VoteValue } from '../../enums.js';
-import { toggleVote } from '../voteToggle.js';
+import type { VoteValue } from '../../enums';
+import { toggleVote } from '../voteToggle';
 
 describe('toggleVote', () => {
   it('creates an upvote when there is no prior vote', () => {

@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Dummy build-time values so `next build` and `tsc` can run without a live
+  # Directus/Clerk instance. Real deployments supply real secrets — see
+  # apps/web/.env.example and apps/directus/.env.example.
+  DIRECTUS_URL: http://localhost:8055
+  NEXT_PUBLIC_DIRECTUS_URL: http://localhost:8055
+  DIRECTUS_SERVICE_TOKEN: ci-placeholder-token
+  # Decodes to a well-formed (but non-existent) *.clerk.accounts.dev frontend
+  # API host — satisfies Clerk's publishableKey format check at build time.
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_cGxhY2Vob2xkZXItZm9yLWNpLmNsZXJrLmFjY291bnRzLmRldiQ
+  CLERK_SECRET_KEY: sk_test_ci-placeholder-not-a-real-key
+  NEXT_PUBLIC_SITE_URL: http://localhost:3000
+  NEXT_PUBLIC_DEFAULT_TENANT_SLUG: supermarket
+
+jobs:
+  ci:
+    name: lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build

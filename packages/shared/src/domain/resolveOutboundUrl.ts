@@ -1,5 +1,5 @@
-import type { AffiliateNetwork } from '../enums.js';
-import type { AffiliateParams } from '../collections/commerce.js';
+import type { AffiliateNetwork } from '../enums';
+import type { AffiliateParams } from '../collections/commerce';
 
 export interface AffiliateProgramLike {
   linkTemplate: string;

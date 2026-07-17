@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { slugSchema, urlSchema, uuidSchema } from './common.js';
-import type { AttributeType } from '../enums.js';
+import { slugSchema, urlSchema, uuidSchema } from './common';
+import type { AttributeType } from '../enums';
 
 export const itemAttributeInputSchema = z.object({
   definitionId: uuidSchema,

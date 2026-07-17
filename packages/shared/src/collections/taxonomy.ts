@@ -1,8 +1,8 @@
-import type { CategoryStatus, TagContext } from '../enums.js';
-import type { Relation, SystemFields } from './base.js';
-import type { Item } from './content.js';
-import type { Tenant } from './tenancy.js';
-import type { Retailer } from './commerce.js';
+import type { CategoryStatus, TagContext } from '../enums';
+import type { Relation, SystemFields } from './base';
+import type { Item } from './content';
+import type { Tenant } from './tenancy';
+import type { Retailer } from './commerce';
 
 export interface Category extends SystemFields {
   tenant: Relation<Tenant>;

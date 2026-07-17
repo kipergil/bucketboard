@@ -19,6 +19,8 @@
     "db:seed": "pnpm --filter=./apps/directus seed",
     "schema:apply": "pnpm --filter=./apps/directus schema:apply",
     "schema:snapshot": "pnpm --filter=./apps/directus schema:snapshot",
+    "permissions:apply": "pnpm --filter=./apps/directus permissions:apply",
+    "flows:apply": "pnpm --filter=./apps/directus flows:apply",
     "tenant:clone": "pnpm --filter=./apps/directus tenant:clone",
     "prepare": "husky"
   },
@@ -30,5 +32,13 @@
     "prettier-plugin-tailwindcss": "^0.6.11",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.19.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@clerk/shared",
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }

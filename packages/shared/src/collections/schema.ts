@@ -1,8 +1,8 @@
-import type { DirectusUser } from './users.js';
-import type { Membership, Tenant } from './tenancy.js';
-import type { Category, ItemTag, RetailerTag, Tag } from './taxonomy.js';
-import type { AttributeDefinition, Item, ItemAttribute } from './content.js';
-import type { Comment, Report, Vote } from './engagement.js';
+import type { DirectusUser } from './users';
+import type { Membership, Tenant } from './tenancy';
+import type { Category, ItemTag, RetailerTag, Tag } from './taxonomy';
+import type { AttributeDefinition, Item, ItemAttribute } from './content';
+import type { Comment, Report, Vote } from './engagement';
 import type {
   AffiliateProgram,
   EnrichmentJob,
@@ -11,7 +11,7 @@ import type {
   Retailer,
   RetailerLocation,
   RetailerTenantSettings,
-} from './commerce.js';
+} from './commerce';
 
 /**
  * The full BucketBoard Directus schema, keyed by collection name. Pass this

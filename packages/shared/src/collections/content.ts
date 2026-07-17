@@ -1,7 +1,7 @@
-import type { AttributeType, ItemStatus } from '../enums.js';
-import type { Relation, SystemFields } from './base.js';
-import type { Tenant } from './tenancy.js';
-import type { Category } from './taxonomy.js';
+import type { AttributeType, ItemStatus } from '../enums';
+import type { Relation, SystemFields } from './base';
+import type { Tenant } from './tenancy';
+import type { Category } from './taxonomy';
 
 export interface Item extends SystemFields {
   tenant: Relation<Tenant>;

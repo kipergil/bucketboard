@@ -1,4 +1,4 @@
-import type { AuthProvider } from '../enums.js';
+import type { AuthProvider } from '../enums';
 
 /**
  * Custom fields added to directus_users. Panel logins (staff) stay native

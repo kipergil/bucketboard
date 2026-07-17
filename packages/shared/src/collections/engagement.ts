@@ -4,11 +4,11 @@ import type {
   ReportStatus,
   ReportTargetCollection,
   VoteValue,
-} from '../enums.js';
-import type { Relation, SystemFields } from './base.js';
-import type { Tenant } from './tenancy.js';
-import type { Item } from './content.js';
-import type { DirectusUser } from './users.js';
+} from '../enums';
+import type { Relation, SystemFields } from './base';
+import type { Tenant } from './tenancy';
+import type { Item } from './content';
+import type { DirectusUser } from './users';
 
 export interface Vote extends SystemFields {
   tenant: Relation<Tenant>;
