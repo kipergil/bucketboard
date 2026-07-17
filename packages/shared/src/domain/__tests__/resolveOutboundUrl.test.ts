@@ -4,7 +4,7 @@ import {
   type AffiliateProgramLike,
   type ItemOfferLike,
   type RetailerLike,
-} from '../resolveOutboundUrl.js';
+} from '../resolveOutboundUrl';
 
 function baseOffer(overrides: Partial<ItemOfferLike> = {}): ItemOfferLike {
   return {

@@ -6,3 +6,4 @@ coverage
 pnpm-lock.yaml
 apps/directus/database
 apps/directus/uploads
+apps/web/next-env.d.ts

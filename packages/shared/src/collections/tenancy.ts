@@ -1,6 +1,6 @@
-import type { MembershipRole, MembershipStatus, TenantStatus } from '../enums.js';
-import type { Relation, SystemFields } from './base.js';
-import type { DirectusUser } from './users.js';
+import type { MembershipRole, MembershipStatus, TenantStatus } from '../enums';
+import type { Relation, SystemFields } from './base';
+import type { DirectusUser } from './users';
 
 export interface TenantSettings {
   theme?: {

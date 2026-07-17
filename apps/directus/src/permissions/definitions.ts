@@ -19,6 +19,11 @@ export const publicPolicy: PolicyDefinition = {
   appAccess: false,
   rules: [
     { collection: 'tenants', action: 'read', filter: ACTIVE_TENANT },
+    // Item images, retailer logos/covers, category covers, store photos —
+    // all rendered on public pages, so the Files API needs to serve them
+    // to anonymous requests. No sensitive files are ever uploaded through
+    // app flows (submissions only accept images).
+    { collection: 'directus_files', action: 'read' },
     { collection: 'categories', action: 'read', filter: PUBLISHED },
     { collection: 'tags', action: 'read' },
     { collection: 'item_tags', action: 'read' },

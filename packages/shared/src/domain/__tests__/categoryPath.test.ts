@@ -5,7 +5,7 @@ import {
   isDescendantPath,
   recomputeCategoryPaths,
   type CategoryNode,
-} from '../categoryPath.js';
+} from '../categoryPath';
 
 describe('recomputeCategoryPaths', () => {
   it('computes path and depth for a flat top-level category', () => {

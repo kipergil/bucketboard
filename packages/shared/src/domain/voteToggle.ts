@@ -1,4 +1,4 @@
-import type { VoteValue } from '../enums.js';
+import type { VoteValue } from '../enums';
 
 export type VoteToggleAction = 'create' | 'update' | 'delete';
 

@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { uuidSchema } from './common.js';
-import { REPORT_REASON, REPORT_TARGET_COLLECTION, VOTE_VALUE } from '../enums.js';
+import { uuidSchema } from './common';
+import { REPORT_REASON, REPORT_TARGET_COLLECTION, VOTE_VALUE } from '../enums';
 
 export const castVoteSchema = z.object({
   itemId: uuidSchema,
