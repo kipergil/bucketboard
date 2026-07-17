@@ -1,4 +1,12 @@
-const DIRECTUS_PUBLIC_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL ?? process.env.DIRECTUS_URL ?? '';
+// Strip any trailing slash so callers can set NEXT_PUBLIC_DIRECTUS_URL with
+// or without one (e.g. "https://host.example.com/") without producing a
+// double slash when concatenated with "/assets/..." below — a malformed
+// path Directus's asset endpoint 404s on.
+const DIRECTUS_PUBLIC_URL = (
+  process.env.NEXT_PUBLIC_DIRECTUS_URL ??
+  process.env.DIRECTUS_URL ??
+  ''
+).replace(/\/+$/, '');
 
 export interface AssetOptions {
   width?: number;
