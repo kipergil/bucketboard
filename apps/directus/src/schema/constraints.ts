@@ -50,8 +50,14 @@ const statements: string[] = [
 ];
 
 export async function applyConstraints(): Promise<void> {
-  const connectionString =
-    process.env.DATABASE_URL ?? 'postgresql://directus:directus@localhost:5432/directus';
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error(
+      'DATABASE_URL is not set. A silent localhost fallback here would risk applying these ' +
+        'constraints to the wrong database (e.g. a local dev Postgres) when tooling is pointed ' +
+        'at a remote Directus instance — set DATABASE_URL explicitly to the target Postgres.',
+    );
+  }
   const client = new Client({ connectionString });
   await client.connect();
 

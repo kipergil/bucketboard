@@ -270,7 +270,11 @@ roles (`Tenant Admin`, `Moderator`).
 ## Getting started
 
 Prerequisites: Node ≥ 20, pnpm ≥ 9 (repo pins `pnpm@10.33.0` via
-`packageManager`), Docker (for Postgres/Redis/Directus).
+`packageManager`), Docker (for Postgres/Redis/Directus). `docker-compose.yml`
+pins `directus/directus:11`; if pointing the apply scripts at an existing
+Directus instance instead, it must also be Directus ≥ 11 — `permissions:apply`
+depends on the Policies/Access model introduced in that major version and
+fails fast with a clear error against anything older.
 
 ```bash
 git clone https://github.com/kipergil/bucketboard.git
