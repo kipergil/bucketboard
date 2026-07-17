@@ -2839,6 +2839,31 @@ fields:
       validation: null
       validation_message: null
       width: full
+  - collection: directus_users
+    field: memberships
+    type: alias
+    meta:
+      collection: directus_users
+      conditions: null
+      display: null
+      display_options: null
+      field: memberships
+      group: null
+      hidden: false
+      interface: list-o2m
+      note: null
+      options:
+        enableSelect: false
+      readonly: false
+      required: false
+      searchable: true
+      sort: 1
+      special:
+        - o2m
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
   - collection: enrichment_jobs
     field: id
     type: uuid
