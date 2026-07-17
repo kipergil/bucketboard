@@ -1,6 +1,7 @@
 import {
   authentication,
   createDirectus,
+  customEndpoint,
   rest,
   type DirectusClient,
   type RestClient,
@@ -24,10 +25,21 @@ export type SchemaClient = DirectusClient<Record<string, unknown[]>> &
 let cachedAdminClient: AdminClient | null = null;
 let cachedSchemaClient: SchemaClient | null = null;
 
-async function login<T extends { login: (email: string, password: string) => Promise<unknown> }>(
-  client: T,
-): Promise<T> {
+async function login<
+  T extends {
+    login: (email: string, password: string) => Promise<unknown>;
+    request: RestClient<never>['request'];
+  },
+>(client: T): Promise<T> {
   await client.login(env.ADMIN_EMAIL, env.ADMIN_PASSWORD);
+  // These tooling scripts do read-then-write idempotency checks across
+  // separate process runs (schema/seed/permissions apply). Directus's
+  // Redis-backed query cache can serve a stale "not found" for a row a
+  // previous run just created — observed live as a duplicate-create
+  // unique-constraint error on a second `pnpm db:seed` run — so every
+  // script starts from a clean cache rather than trusting invalidation
+  // across runs.
+  await client.request(customEndpoint({ path: '/utils/cache/clear', method: 'POST' }));
   return client;
 }
 
