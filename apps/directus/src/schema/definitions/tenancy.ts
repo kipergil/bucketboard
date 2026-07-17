@@ -43,6 +43,8 @@ const membershipsUser = m2o('memberships', 'user', 'directus_users', {
   required: true,
   nullable: false,
   template: '{{first_name}} {{last_name}}',
+  oneField: 'memberships',
+  note: 'Reverse alias also used by permission filters: $CURRENT_USER.memberships.tenant.',
 });
 
 export const membershipsCollection: CollectionDefinition = {
