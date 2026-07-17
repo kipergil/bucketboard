@@ -9,21 +9,23 @@ export function ItemCard({ item, tenantSlug }: { item: Item; tenantSlug: string 
   const image = assetUrl(item.image, 'card');
 
   return (
-    <Card className="overflow-hidden py-0">
+    <Card className="group overflow-hidden py-0 transition-all hover:-translate-y-0.5 hover:shadow-md">
       <Link href={`/t/${tenantSlug}/i/${item.slug}`} className="block">
-        <div className="bg-muted aspect-4/3 relative w-full">
+        <div className="bg-muted aspect-4/3 relative w-full overflow-hidden">
           {image ? (
             <Image
               src={image}
               alt=""
               fill
               sizes="(min-width: 768px) 25vw, 50vw"
-              className="object-cover"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : null}
         </div>
-        <CardContent className="space-y-1.5 p-3">
-          <h3 className="line-clamp-2 font-medium leading-snug">{item.title}</h3>
+        <CardContent className="space-y-1.5 p-3.5">
+          <h3 className="group-hover:text-primary line-clamp-2 font-medium leading-snug transition-colors">
+            {item.title}
+          </h3>
           {item.brand ? <p className="text-muted-foreground text-sm">{item.brand}</p> : null}
           <div className="text-muted-foreground flex items-center gap-3 pt-1 text-xs">
             <span className="flex items-center gap-1">

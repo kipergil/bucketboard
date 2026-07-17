@@ -32,7 +32,9 @@ export default async function ProfilePage(props: ProfilePageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">{profile.membership.display_name}</h1>
+        <h1 className="font-heading text-2xl font-bold tracking-tight">
+          {profile.membership.display_name}
+        </h1>
         <div className="mt-2 flex items-center gap-2">
           <Badge variant="secondary">{profile.membership.role}</Badge>
           <span className="text-muted-foreground text-sm">{profile.membership.karma} karma</span>
@@ -40,7 +42,7 @@ export default async function ProfilePage(props: ProfilePageProps) {
       </div>
 
       <section>
-        <h2 className="mb-3 text-lg font-semibold">Submitted items</h2>
+        <h2 className="font-heading mb-3 text-lg font-semibold">Submitted items</h2>
         {profile.items.length > 0 ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
             {profile.items.map((item) => (

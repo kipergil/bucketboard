@@ -15,7 +15,7 @@ export default async function AffiliateDisclosurePage({
 
   return (
     <div className="max-w-2xl space-y-4">
-      <h1 className="text-2xl font-bold">Affiliate disclosure</h1>
+      <h1 className="font-heading text-2xl font-bold tracking-tight">Affiliate disclosure</h1>
       <p>
         {tenant.name} participates in affiliate marketing programmes, including the Amazon
         Associates Programme and various UK retailer affiliate networks. This means that when you

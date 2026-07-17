@@ -5,6 +5,8 @@ import { listStoreDirectory, listCities } from '@/services/stores';
 import { storeDirectoryQuerySchema } from '@bucketboard/shared';
 import { Pagination } from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = { title: 'Stores' };
 
@@ -45,15 +47,18 @@ export default async function StoresDirectoryPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Physical stores</h1>
+      <h1 className="font-heading text-2xl font-bold tracking-tight">Physical stores</h1>
 
-      <form method="get" className="flex flex-wrap items-end gap-3 text-sm">
-        <label className="flex flex-col gap-1">
-          <span className="text-muted-foreground">City</span>
+      <form
+        method="get"
+        className="bg-muted/50 flex flex-wrap items-end gap-4 rounded-xl border p-4 text-sm"
+      >
+        <label className="flex flex-col gap-1.5">
+          <span className="text-muted-foreground text-xs font-medium">City</span>
           <select
             name="city"
             defaultValue={query.city ?? ''}
-            className="border-input bg-background h-9 rounded-md border px-2"
+            className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3 h-9 rounded-lg border px-2.5 outline-none"
           >
             <option value="">Any</option>
             {cities.map((city) => (
@@ -63,17 +68,17 @@ export default async function StoresDirectoryPage({
             ))}
           </select>
         </label>
-        <label className="flex items-center gap-2">
+        <label className="flex h-9 items-center gap-2">
           <input
             type="checkbox"
             name="openNow"
             value="true"
             defaultChecked={query.openNow}
-            className="size-4"
+            className="accent-primary size-4"
           />
           <span>Open now</span>
         </label>
-        <button type="submit" className="bg-primary text-primary-foreground h-9 rounded-md px-3">
+        <button type="submit" className={cn(buttonVariants({ size: 'default' }))}>
           Filter
         </button>
       </form>
@@ -84,9 +89,11 @@ export default async function StoresDirectoryPage({
             <li key={store.id}>
               <Link
                 href={`/t/${tenant.slug}/s/${store.retailerSlug}/${store.slug}`}
-                className="block rounded-lg border p-4 hover:shadow-sm"
+                className="hover:border-primary/30 group block rounded-xl border p-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
               >
-                <p className="font-medium">{store.name}</p>
+                <p className="group-hover:text-primary font-medium transition-colors">
+                  {store.name}
+                </p>
                 <p className="text-muted-foreground text-sm">{store.retailerName}</p>
                 <p className="text-muted-foreground text-sm">
                   {store.city}, {store.postcode}

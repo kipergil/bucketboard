@@ -70,7 +70,7 @@ export default async function RetailerPage(props: RetailerPageProps) {
           </div>
         ) : null}
         <div>
-          <h1 className="text-2xl font-bold">{retailer.name}</h1>
+          <h1 className="font-heading text-2xl font-bold tracking-tight">{retailer.name}</h1>
           <div className="mt-1 flex gap-1.5">
             <Badge variant="secondary">{retailer.kind.replace('_', ' ')}</Badge>
             <Badge variant="outline">{retailer.type}</Badge>
@@ -94,7 +94,7 @@ export default async function RetailerPage(props: RetailerPageProps) {
 
       {locations.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-lg font-semibold">Locations</h2>
+          <h2 className="font-heading mb-3 text-lg font-semibold">Locations</h2>
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
             {locations.map((location) => (
               <li key={location.id}>
@@ -113,7 +113,7 @@ export default async function RetailerPage(props: RetailerPageProps) {
 
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Items at {retailer.name}</h2>
+          <h2 className="font-heading text-lg font-semibold">Items at {retailer.name}</h2>
           <p className="text-muted-foreground text-sm">{total} items</p>
         </div>
         {items.length > 0 ? (

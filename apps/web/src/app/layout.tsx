@@ -1,17 +1,20 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Toaster } from '@/components/ui/sonner';
 import { QueryProvider } from '@/components/providers/query-provider';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+// Distinct display face for headings — the friendlier, more distinctive
+// pairing partner to Inter's body text, kept to a single weight axis
+// (variable font) so it's still one network request.
+const headingFont = Plus_Jakarta_Sans({
+  variable: '--font-heading',
   subsets: ['latin'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const bodyFont = Inter({
+  variable: '--font-body',
   subsets: ['latin'],
 });
 
@@ -26,7 +29,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <html lang="en" className={`${headingFont.variable} ${bodyFont.variable} h-full antialiased`}>
         <body className="flex min-h-full flex-col">
           <QueryProvider>
             {children}

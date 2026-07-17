@@ -9,19 +9,21 @@ export function RetailerCard({ retailer, tenantSlug }: { retailer: Retailer; ten
   const logo = assetUrl(retailer.logo, 'thumb');
 
   return (
-    <Link href={`/t/${tenantSlug}/s/${retailer.slug}`}>
-      <Card className="h-full transition-shadow hover:shadow-md">
+    <Link href={`/t/${tenantSlug}/s/${retailer.slug}`} className="group">
+      <Card className="h-full transition-all group-hover:-translate-y-0.5 group-hover:shadow-md">
         <CardContent className="flex items-center gap-3 p-4">
-          <div className="bg-muted relative size-12 shrink-0 overflow-hidden rounded-full">
+          <div className="bg-muted ring-border relative size-12 shrink-0 overflow-hidden rounded-full ring-1">
             {logo ? <Image src={logo} alt="" fill sizes="48px" className="object-cover" /> : null}
           </div>
           <div className="min-w-0">
-            <p className="truncate font-medium">{retailer.name}</p>
-            <div className="mt-1 flex gap-1.5">
-              <Badge variant="secondary" className="text-[11px]">
+            <p className="group-hover:text-primary truncate font-medium transition-colors">
+              {retailer.name}
+            </p>
+            <div className="mt-1.5 flex gap-1.5">
+              <Badge variant="secondary" className="text-[11px] capitalize">
                 {retailer.kind.replace('_', ' ')}
               </Badge>
-              <Badge variant="outline" className="text-[11px]">
+              <Badge variant="outline" className="text-[11px] capitalize">
                 {retailer.type}
               </Badge>
             </div>

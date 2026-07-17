@@ -25,7 +25,7 @@ export default async function SearchPage({
   if (!parsed.success) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">Search</h1>
+        <h1 className="font-heading text-2xl font-bold tracking-tight">Search</h1>
         <p className="text-muted-foreground">Enter a search term to get started.</p>
       </div>
     );
@@ -38,11 +38,13 @@ export default async function SearchPage({
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold">Results for &ldquo;{parsed.data.q}&rdquo;</h1>
+      <h1 className="font-heading text-2xl font-bold tracking-tight">
+        Results for &ldquo;{parsed.data.q}&rdquo;
+      </h1>
 
       {results.items.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-lg font-semibold">Items</h2>
+          <h2 className="font-heading mb-3 text-lg font-semibold">Items</h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
             {results.items.map((item) => (
               <ItemCard key={item.id} item={item} tenantSlug={tenant.slug} />
@@ -53,7 +55,7 @@ export default async function SearchPage({
 
       {results.retailers.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-lg font-semibold">Shops</h2>
+          <h2 className="font-heading mb-3 text-lg font-semibold">Shops</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {results.retailers.map((retailer) => (
               <RetailerCard key={retailer.id} retailer={retailer} tenantSlug={tenant.slug} />
@@ -64,15 +66,17 @@ export default async function SearchPage({
 
       {results.locations.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-lg font-semibold">Stores</h2>
+          <h2 className="font-heading mb-3 text-lg font-semibold">Stores</h2>
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {results.locations.map((location) => (
               <li key={location.id}>
                 <Link
                   href={`/t/${tenant.slug}/stores`}
-                  className="block rounded-lg border p-3 hover:shadow-sm"
+                  className="hover:border-primary/30 group block rounded-xl border p-3 transition-all hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  <p className="font-medium">{location.name}</p>
+                  <p className="group-hover:text-primary font-medium transition-colors">
+                    {location.name}
+                  </p>
                   <p className="text-muted-foreground text-sm">{location.city}</p>
                 </Link>
               </li>
