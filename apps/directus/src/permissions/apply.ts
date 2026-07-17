@@ -13,6 +13,7 @@ import {
   updateUser,
 } from '@directus/sdk';
 import { getSchemaClient } from '../lib/client.js';
+import { assertMinimumDirectusVersion } from '../lib/version.js';
 import { allPolicies, publicPolicy } from './definitions.js';
 import type { PolicyDefinition } from './types.js';
 
@@ -204,6 +205,7 @@ async function ensureServiceAccount(client: Client): Promise<void> {
 async function main() {
   console.log('Applying BucketBoard permissions...');
   const client = await getSchemaClient();
+  await assertMinimumDirectusVersion(client);
 
   console.log('\nPublic policy (built-in)');
   const publicPolicyId = await findPublicPolicyId(client);
