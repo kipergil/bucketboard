@@ -223,7 +223,7 @@ export interface CreateItemInput {
   title: string;
   slug: string;
   url: string | null;
-  body: string;
+  body: string | null;
   brand: string | null;
   imageAssetId: string | null;
   authorUserId: string;

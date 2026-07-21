@@ -81,7 +81,7 @@ export function ItemJsonLd({
         '@context': 'https://schema.org',
         '@type': 'Product',
         name: item.title,
-        description: item.body,
+        description: item.body ?? undefined,
         brand: item.brand ?? undefined,
         image: undefined,
         url,

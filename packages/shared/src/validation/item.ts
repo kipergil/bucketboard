@@ -22,7 +22,7 @@ export const submitItemSchema = z.object({
   title: z.string().trim().min(2).max(200),
   slug: slugSchema.optional(),
   url: urlSchema.optional(),
-  body: z.string().trim().min(10).max(10_000),
+  body: z.string().trim().min(10).max(10_000).optional(),
   brand: z.string().trim().max(120).optional(),
   imageAssetId: uuidSchema.nullable().optional(),
   attributes: z.array(itemAttributeInputSchema).default([]),
