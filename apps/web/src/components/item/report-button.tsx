@@ -15,6 +15,14 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import type { ReportReason, ReportTargetCollection } from '@bucketboard/shared';
 
 const REASONS: Array<{ value: ReportReason; label: string }> = [
@@ -82,29 +90,34 @@ export function ReportButton({
           <DialogTitle>Report content</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          <label className="block text-sm">
-            <span className="mb-1 block font-medium">Reason</span>
-            <select
+          <div className="space-y-1.5">
+            <Label htmlFor="report-reason">Reason</Label>
+            <Select
               value={reason}
-              onChange={(e) => setReason(e.target.value as ReportReason)}
-              className="border-input bg-background h-9 w-full rounded-md border px-2 text-sm"
+              onValueChange={(value) => value && setReason(value as ReportReason)}
             >
-              {REASONS.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm">
-            <span className="mb-1 block font-medium">Details (optional)</span>
+              <SelectTrigger id="report-reason" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {REASONS.map((r) => (
+                  <SelectItem key={r.value} value={r.value}>
+                    {r.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="report-details">Details (optional)</Label>
             <Textarea
+              id="report-details"
               value={details}
               onChange={(e) => setDetails(e.target.value)}
               rows={3}
               maxLength={2000}
             />
-          </label>
+          </div>
         </div>
         <DialogFooter>
           <Button onClick={handleSubmit} disabled={isPending}>

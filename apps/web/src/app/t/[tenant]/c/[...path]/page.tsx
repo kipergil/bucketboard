@@ -1,5 +1,7 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { PackageSearch, PlusCircle } from 'lucide-react';
 import { getTenantBySlug } from '@/services/tenants';
 import { getCategoryByPath, getCategoryTree } from '@/services/categories';
 import { listItemsInCategorySubtree } from '@/services/items';
@@ -15,6 +17,8 @@ import { RetailerFilter } from '@/components/category/retailer-filter';
 import { ItemCard } from '@/components/item/item-card';
 import { Pagination } from '@/components/pagination';
 import { CategoryJsonLd } from '@/components/seo/json-ld';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Button } from '@/components/ui/button';
 
 interface CategoryPageProps {
   params: Promise<{ tenant: string; path: string[] }>;
@@ -124,9 +128,22 @@ export default async function CategoryPage(props: CategoryPageProps) {
           ))}
         </div>
       ) : (
-        <p className="text-muted-foreground py-12 text-center">
-          No items here yet — be the first to submit one.
-        </p>
+        <EmptyState
+          icon={PackageSearch}
+          title="No items here yet"
+          description="Be the first to submit a favourite in this category."
+          action={
+            <Button
+              size="sm"
+              render={
+                <Link href={`/t/${tenant.slug}/submit`}>
+                  <PlusCircle data-icon="inline-start" />
+                  Submit an item
+                </Link>
+              }
+            />
+          }
+        />
       )}
 
       <Pagination page={query.page} pageSize={pageSize} total={total} buildHref={buildHref} />
