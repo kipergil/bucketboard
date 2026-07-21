@@ -11,6 +11,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.112.4",
     "@base-ui/react": "^1.6.0",
     "@bucketboard/shared": "workspace:*",
     "@clerk/nextjs": "^6.14.0",

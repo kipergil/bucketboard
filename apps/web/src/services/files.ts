@@ -1,5 +1,5 @@
 import 'server-only';
-import { uploadFiles } from '@directus/sdk';
+import { uploadFiles, importFile } from '@directus/sdk';
 import { getServiceDirectusClient } from '../lib/directus/client';
 
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
@@ -21,4 +21,11 @@ export async function uploadImage(file: File): Promise<string> {
   formData.append('file', file);
   const uploaded = await client.request(uploadFiles(formData, { fields: ['id'] }));
   return uploaded.id;
+}
+
+/** Imports a remote image (e.g. discovered by the quick-add AI flow) directly into Directus Files, server-side. */
+export async function importImageFromUrl(url: string): Promise<string> {
+  const client = getServiceDirectusClient();
+  const imported = await client.request(importFile(url, {}, { fields: ['id'] }));
+  return (imported as { id: string }).id;
 }

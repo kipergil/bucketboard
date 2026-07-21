@@ -10,7 +10,7 @@ const serverEnvSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.string().url().default('http://localhost:3000'),
   NEXT_PUBLIC_DEFAULT_TENANT_SLUG: z.string().default('supermarket'),
   ENRICHMENT_LLM_API_KEY: z.string().optional(),
-  ENRICHMENT_LLM_MODEL: z.string().default('claude-sonnet-5'),
+  ENRICHMENT_LLM_MODEL: z.string().default('claude-opus-4-8'),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
