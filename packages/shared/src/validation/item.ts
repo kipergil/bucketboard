@@ -30,6 +30,24 @@ export const submitItemSchema = z.object({
 });
 export type SubmitItemInput = z.infer<typeof submitItemSchema>;
 
+export const quickAddInputSchema = z.object({
+  text: z.string().trim().min(1).max(4000),
+});
+export type QuickAddInput = z.infer<typeof quickAddInputSchema>;
+
+/** Shape of the AI-extracted preview for the "paste a link / WhatsApp message" quick-add flow. */
+export const quickAddExtractionSchema = z.object({
+  title: z.string().max(200).nullable(),
+  brand: z.string().max(120).nullable(),
+  body: z.string().max(10_000).nullable(),
+  url: z.string().nullable(),
+  imageUrl: z.string().nullable(),
+  price: z.number().nonnegative().nullable(),
+  currency: z.string().nullable(),
+  categoryName: z.string().nullable(),
+});
+export type QuickAddExtraction = z.infer<typeof quickAddExtractionSchema>;
+
 export const attributeDefinitionValueSchema = (type: AttributeType) => {
   switch (type) {
     case 'text':
