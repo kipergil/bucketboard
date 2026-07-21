@@ -1,16 +1,17 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { ImagePlus, Loader2, X } from 'lucide-react';
 import {
   submitItemSchema,
   type SubmitItemInput,
   type QuickAddExtraction,
 } from '@bucketboard/shared';
-import type { AttributeDefinition, Category } from '@bucketboard/shared';
+import type { Category } from '@bucketboard/shared';
 import { submitItemAction, uploadItemImageAction } from '@/actions/items';
 import { quickAddParseAction, importQuickAddImageAction } from '@/actions/quickAdd';
 import { Button } from '@/components/ui/button';
@@ -28,24 +29,25 @@ interface RetailerOption {
 export function SubmitItemForm({
   tenantSlug,
   categories,
-  attributeDefinitions,
   retailers,
 }: {
   tenantSlug: string;
   categories: Category[];
-  attributeDefinitions: AttributeDefinition[];
   retailers: RetailerOption[];
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [imageFileId, setImageFileId] = useState<string | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imageUploading, setImageUploading] = useState(false);
+  const [importingImage, setImportingImage] = useState(false);
 
   const [quickAddText, setQuickAddText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [quickAddError, setQuickAddError] = useState<string | null>(null);
   const [quickAddPreview, setQuickAddPreview] = useState<QuickAddExtraction | null>(null);
-  const [importingImage, setImportingImage] = useState(false);
 
   const {
     register,
@@ -58,22 +60,22 @@ export function SubmitItemForm({
     defaultValues: {
       categoryId: categories[0]?.id ?? '',
       title: '',
-      body: '',
       attributes: [],
       shopLinks: [{ url: '' }],
     },
   });
 
   const { fields, append, remove } = useFieldArray({ control, name: 'shopLinks' });
-  const selectedCategoryId = useWatch({ control, name: 'categoryId' });
 
-  const relevantDefinitions = attributeDefinitions.filter(
-    (def) => def.category === null || def.category === selectedCategoryId,
-  );
+  function setImage(fileId: string | null, previewUrl: string | null) {
+    setImageFileId(fileId);
+    setImagePreviewUrl(previewUrl);
+  }
 
   async function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
+    setImagePreviewUrl(URL.createObjectURL(file));
     setImageUploading(true);
     const formData = new FormData();
     formData.append('file', file);
@@ -81,6 +83,7 @@ export function SubmitItemForm({
     setImageUploading(false);
     if (!result.ok) {
       toast.error(result.error ?? 'Upload failed.');
+      setImage(null, null);
       return;
     }
     setImageFileId(result.fileId ?? null);
@@ -103,12 +106,8 @@ export function SubmitItemForm({
   function applyQuickAddPreview() {
     if (!quickAddPreview) return;
     if (quickAddPreview.title) setValue('title', quickAddPreview.title, { shouldValidate: true });
-    if (quickAddPreview.brand) setValue('brand', quickAddPreview.brand);
-    if (quickAddPreview.body) setValue('body', quickAddPreview.body, { shouldValidate: true });
-    if (quickAddPreview.url) {
-      setValue('url', quickAddPreview.url);
+    if (quickAddPreview.url)
       setValue('shopLinks.0.url', quickAddPreview.url, { shouldValidate: true });
-    }
     if (quickAddPreview.price != null) setValue('shopLinks.0.price', quickAddPreview.price);
     if (quickAddPreview.categoryName) {
       const needle = quickAddPreview.categoryName.toLowerCase();
@@ -120,6 +119,7 @@ export function SubmitItemForm({
     }
     if (quickAddPreview.imageUrl) {
       const imageUrl = quickAddPreview.imageUrl;
+      setImagePreviewUrl(imageUrl);
       setImportingImage(true);
       importQuickAddImageAction(imageUrl)
         .then((result) => {
@@ -133,7 +133,7 @@ export function SubmitItemForm({
     }
     setQuickAddPreview(null);
     setQuickAddText('');
-    toast.success('Applied — review the fields below before submitting.');
+    toast.success('Applied — review the details below before submitting.');
   }
 
   function onSubmit(values: SubmitItemInput) {
@@ -155,7 +155,7 @@ export function SubmitItemForm({
           <CardTitle>Quick add</CardTitle>
           <CardDescription>
             Paste a link, or a WhatsApp-style message that contains one — we&apos;ll fetch it and
-            pre-fill the form below.
+            pre-fill the details below.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -189,23 +189,14 @@ export function SubmitItemForm({
                 />
               ) : null}
               <p className="text-sm font-medium">{quickAddPreview.title ?? 'Untitled'}</p>
-              {quickAddPreview.brand ? (
-                <p className="text-muted-foreground text-sm">{quickAddPreview.brand}</p>
-              ) : null}
-              {quickAddPreview.body ? <p className="text-sm">{quickAddPreview.body}</p> : null}
               {quickAddPreview.price != null ? (
                 <p className="text-sm">
                   {quickAddPreview.currency ?? ''} {quickAddPreview.price}
                 </p>
               ) : null}
               <div className="flex gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={applyQuickAddPreview}
-                  disabled={importingImage}
-                >
-                  {importingImage ? 'Importing image…' : 'Apply to form'}
+                <Button type="button" size="sm" onClick={applyQuickAddPreview}>
+                  Apply to form
                 </Button>
                 <Button
                   type="button"
@@ -222,11 +213,61 @@ export function SubmitItemForm({
       </Card>
 
       <div className="space-y-1.5">
+        <Label>Photo</Label>
+        <input
+          ref={fileInputRef}
+          id="image"
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={handleImageChange}
+        />
+        <div className="relative size-32">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={imageUploading || importingImage}
+            className="border-input bg-muted hover:bg-accent focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 flex size-32 flex-col items-center justify-center gap-1.5 overflow-hidden rounded-xl border border-dashed text-sm outline-none transition-colors disabled:pointer-events-none disabled:opacity-50"
+          >
+            {imagePreviewUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={imagePreviewUrl} alt="" className="size-full object-cover" />
+            ) : (
+              <>
+                <ImagePlus className="text-muted-foreground size-5" aria-hidden="true" />
+                <span className="text-muted-foreground text-xs">Add photo</span>
+              </>
+            )}
+          </button>
+          {imageUploading || importingImage ? (
+            <div className="bg-background/70 absolute inset-0 flex items-center justify-center rounded-xl">
+              <Loader2 className="text-muted-foreground size-5 animate-spin" aria-hidden="true" />
+            </div>
+          ) : imagePreviewUrl ? (
+            <button
+              type="button"
+              onClick={() => setImage(null, null)}
+              aria-label="Remove photo"
+              className="bg-foreground text-background absolute -right-1.5 -top-1.5 flex size-6 items-center justify-center rounded-full shadow-sm"
+            >
+              <X className="size-3.5" aria-hidden="true" />
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="title">Title</Label>
+        <Input id="title" placeholder="e.g. Belvita Breakfast Biscuits" {...register('title')} />
+        {errors.title ? <p className="text-destructive text-sm">{errors.title.message}</p> : null}
+      </div>
+
+      <div className="space-y-1.5">
         <Label htmlFor="category">Category</Label>
         <select
           id="category"
           {...register('categoryId')}
-          className="border-input bg-background h-9 w-full rounded-md border px-2 text-sm"
+          className="border-input bg-background focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 h-9 w-full rounded-lg border px-2.5 text-sm outline-none"
         >
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
@@ -238,52 +279,6 @@ export function SubmitItemForm({
           <p className="text-destructive text-sm">{errors.categoryId.message}</p>
         ) : null}
       </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="title">Title</Label>
-        <Input id="title" {...register('title')} />
-        {errors.title ? <p className="text-destructive text-sm">{errors.title.message}</p> : null}
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="brand">Brand (optional)</Label>
-        <Input id="brand" {...register('brand')} />
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="url">Reference link (optional)</Label>
-        <Input id="url" type="url" {...register('url')} placeholder="https://…" />
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="image">Image</Label>
-        <Input id="image" type="file" accept="image/*" onChange={handleImageChange} />
-        {imageUploading ? <p className="text-muted-foreground text-sm">Uploading…</p> : null}
-        {imageFileId ? <p className="text-sm text-green-600">Image uploaded.</p> : null}
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="body">Your review</Label>
-        <Textarea id="body" rows={5} {...register('body')} />
-        {errors.body ? <p className="text-destructive text-sm">{errors.body.message}</p> : null}
-      </div>
-
-      {relevantDefinitions.length > 0 ? (
-        <fieldset className="space-y-3">
-          <legend className="text-sm font-medium">Details</legend>
-          {relevantDefinitions.map((def, index) => (
-            <div key={def.id} className="space-y-1.5">
-              <Label htmlFor={`attr-${def.key}`}>{def.label}</Label>
-              <input
-                type="hidden"
-                {...register(`attributes.${index}.definitionId` as const)}
-                value={def.id}
-              />
-              {renderAttributeInput(def, index, register)}
-            </div>
-          ))}
-        </fieldset>
-      ) : null}
 
       <div className="space-y-3">
         <Label>Where can people buy this?</Label>
@@ -300,7 +295,7 @@ export function SubmitItemForm({
             </div>
             <select
               {...register(`shopLinks.${index}.retailerId` as const)}
-              className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+              className="border-input bg-background focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 h-9 rounded-lg border px-2 text-sm outline-none"
               defaultValue=""
             >
               <option value="">Auto-detect retailer</option>
@@ -332,51 +327,9 @@ export function SubmitItemForm({
         </Button>
       </div>
 
-      <Button type="submit" disabled={isPending || imageUploading}>
+      <Button type="submit" size="lg" className="w-full" disabled={isPending || imageUploading}>
         Submit item
       </Button>
     </form>
-  );
-}
-
-function renderAttributeInput(
-  def: AttributeDefinition,
-  index: number,
-  register: ReturnType<typeof useForm<SubmitItemInput>>['register'],
-) {
-  const name = `attributes.${index}.value` as const;
-  if (def.type === 'boolean') {
-    return (
-      <select
-        {...register(name)}
-        className="border-input bg-background h-9 w-full rounded-md border px-2 text-sm"
-      >
-        <option value="">—</option>
-        <option value="true">Yes</option>
-        <option value="false">No</option>
-      </select>
-    );
-  }
-  if (def.type === 'select' || def.type === 'multiselect') {
-    return (
-      <select
-        {...register(name)}
-        multiple={def.type === 'multiselect'}
-        className="border-input bg-background w-full rounded-md border px-2 text-sm"
-      >
-        {def.options?.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    );
-  }
-  return (
-    <Input
-      id={`attr-${def.key}`}
-      type={def.type === 'number' ? 'number' : 'text'}
-      {...register(name)}
-    />
   );
 }

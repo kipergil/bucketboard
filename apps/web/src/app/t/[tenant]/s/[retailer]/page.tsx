@@ -2,12 +2,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { PackageSearch } from 'lucide-react';
+import { ExternalLink, PackageSearch } from 'lucide-react';
 import { getTenantBySlug } from '@/services/tenants';
 import { getRetailerBySlug, listRetailerLocations } from '@/services/retailers';
 import { listItemsForRetailer } from '@/services/items';
 import { assetUrl } from '@/lib/directus/assets';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ItemCard } from '@/components/item/item-card';
 import { Pagination } from '@/components/pagination';
 import { RetailerJsonLd } from '@/components/seo/json-ld';
@@ -65,28 +66,31 @@ export default async function RetailerPage(props: RetailerPageProps) {
         </div>
       ) : null}
 
-      <div className="flex items-center gap-4">
-        {logo ? (
-          <div className="bg-muted relative size-16 shrink-0 overflow-hidden rounded-full">
-            <Image src={logo} alt="" fill sizes="64px" className="object-cover" />
-          </div>
-        ) : null}
-        <div>
-          <h1 className="font-heading text-2xl font-bold tracking-tight">{retailer.name}</h1>
-          <div className="mt-1 flex gap-1.5">
-            <Badge variant="secondary">{retailer.kind.replace('_', ' ')}</Badge>
-            <Badge variant="outline">{retailer.type}</Badge>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          {logo ? (
+            <div className="bg-muted relative size-16 shrink-0 overflow-hidden rounded-full">
+              <Image src={logo} alt="" fill sizes="64px" className="object-cover" />
+            </div>
+          ) : null}
+          <div>
+            <h1 className="font-heading text-2xl font-bold tracking-tight">{retailer.name}</h1>
+            <div className="mt-1 flex gap-1.5">
+              <Badge variant="secondary">{retailer.kind.replace('_', ' ')}</Badge>
+              <Badge variant="outline">{retailer.type}</Badge>
+            </div>
           </div>
         </div>
         {retailer.website ? (
-          <Link
-            href={retailer.website}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-            className="text-primary ml-auto text-sm hover:underline"
-          >
-            Visit website
-          </Link>
+          <Button
+            size="lg"
+            render={
+              <Link href={retailer.website} target="_blank" rel="noopener noreferrer nofollow">
+                Visit website
+                <ExternalLink data-icon="inline-end" />
+              </Link>
+            }
+          />
         ) : null}
       </div>
 

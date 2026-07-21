@@ -62,7 +62,7 @@ export default async function SearchPage({
       {results.retailers.length > 0 ? (
         <section>
           <h2 className="font-heading mb-3 text-lg font-semibold">Shops</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {results.retailers.map((retailer) => (
               <RetailerCard key={retailer.id} retailer={retailer} tenantSlug={tenant.slug} />
             ))}

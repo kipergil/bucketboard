@@ -57,7 +57,7 @@ export async function submitItemAction(
     title: parsed.data.title,
     slug,
     url: parsed.data.url ?? null,
-    body: parsed.data.body,
+    body: parsed.data.body ?? null,
     brand: parsed.data.brand ?? null,
     imageAssetId: parsed.data.imageAssetId ?? null,
     authorUserId: user.id,

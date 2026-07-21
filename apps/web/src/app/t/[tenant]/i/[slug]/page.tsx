@@ -113,7 +113,7 @@ export default async function ItemPage(props: ItemPageProps) {
 
           <AttributeList attributes={attributes} definitions={definitions} />
 
-          <p className="whitespace-pre-wrap leading-relaxed">{item.body}</p>
+          {item.body ? <p className="whitespace-pre-wrap leading-relaxed">{item.body}</p> : null}
 
           <ReportButton tenantSlug={tenant.slug} targetCollection="items" targetId={item.id} />
 
