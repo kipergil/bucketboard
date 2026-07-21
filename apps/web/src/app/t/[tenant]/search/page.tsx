@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { SearchX, Search } from 'lucide-react';
 import { getTenantBySlug } from '@/services/tenants';
 import { searchTenant } from '@/services/search';
 import { searchQuerySchema } from '@bucketboard/shared';
 import { ItemCard } from '@/components/item/item-card';
 import { RetailerCard } from '@/components/retailer/retailer-card';
+import { EmptyState } from '@/components/ui/empty-state';
 
 export const metadata: Metadata = { title: 'Search' };
 
@@ -24,9 +26,13 @@ export default async function SearchPage({
 
   if (!parsed.success) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <h1 className="font-heading text-2xl font-bold tracking-tight">Search</h1>
-        <p className="text-muted-foreground">Enter a search term to get started.</p>
+        <EmptyState
+          icon={Search}
+          title="Search for items, shops, or stores"
+          description="Enter a search term above to get started."
+        />
       </div>
     );
   }
@@ -88,7 +94,11 @@ export default async function SearchPage({
       {results.items.length === 0 &&
       results.retailers.length === 0 &&
       results.locations.length === 0 ? (
-        <p className="text-muted-foreground">No results found.</p>
+        <EmptyState
+          icon={SearchX}
+          title="No results found"
+          description={`We couldn't find anything for "${parsed.data.q}". Try a different search term.`}
+        />
       ) : null}
     </div>
   );

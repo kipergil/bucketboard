@@ -1,10 +1,13 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
+import { Store } from 'lucide-react';
 import { getTenantBySlug } from '@/services/tenants';
 import { listRetailers } from '@/services/retailers';
 import { retailerDirectoryQuerySchema, RETAILER_TYPE, RETAILER_KIND } from '@bucketboard/shared';
 import { RetailerCard } from '@/components/retailer/retailer-card';
 import { Pagination } from '@/components/pagination';
 import { buttonVariants } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = { title: 'Shops' };
@@ -95,7 +98,16 @@ export default async function ShopsDirectoryPage({
           ))}
         </div>
       ) : (
-        <p className="text-muted-foreground">No shops match those filters.</p>
+        <EmptyState
+          icon={Store}
+          title="No shops match those filters"
+          description="Try a different type or kind, or clear the filters to see every shop."
+          action={
+            <Link href={`/t/${tenant.slug}/shops`} className={cn(buttonVariants({ size: 'sm' }))}>
+              Clear filters
+            </Link>
+          }
+        />
       )}
 
       <Pagination page={query.page} pageSize={pageSize} total={total} buildHref={buildHref} />

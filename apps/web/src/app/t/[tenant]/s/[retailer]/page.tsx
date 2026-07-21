@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { PackageSearch } from 'lucide-react';
 import { getTenantBySlug } from '@/services/tenants';
 import { getRetailerBySlug, listRetailerLocations } from '@/services/retailers';
 import { listItemsForRetailer } from '@/services/items';
@@ -10,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { ItemCard } from '@/components/item/item-card';
 import { Pagination } from '@/components/pagination';
 import { RetailerJsonLd } from '@/components/seo/json-ld';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface RetailerPageProps {
   params: Promise<{ tenant: string; retailer: string }>;
@@ -100,9 +102,11 @@ export default async function RetailerPage(props: RetailerPageProps) {
               <li key={location.id}>
                 <Link
                   href={`/t/${tenant.slug}/s/${retailer.slug}/${location.slug}`}
-                  className="block rounded-lg border p-3 hover:shadow-sm"
+                  className="hover:border-primary/30 group block rounded-xl border p-3 transition-all hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  <p className="font-medium">{location.name}</p>
+                  <p className="group-hover:text-primary font-medium transition-colors">
+                    {location.name}
+                  </p>
                   <p className="text-muted-foreground text-sm">{location.city}</p>
                 </Link>
               </li>
@@ -123,7 +127,11 @@ export default async function RetailerPage(props: RetailerPageProps) {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground">No items yet.</p>
+          <EmptyState
+            icon={PackageSearch}
+            title="No items yet"
+            description={`No community favourites have been linked to ${retailer.name} yet.`}
+          />
         )}
         <Pagination page={page} pageSize={pageSize} total={total} buildHref={buildHref} />
       </section>

@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { Building2 } from 'lucide-react';
 import { getTenantBySlug } from '@/services/tenants';
 import { listStoreDirectory, listCities } from '@/services/stores';
 import { storeDirectoryQuerySchema } from '@bucketboard/shared';
 import { Pagination } from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = { title: 'Stores' };
@@ -109,7 +111,16 @@ export default async function StoresDirectoryPage({
           ))}
         </ul>
       ) : (
-        <p className="text-muted-foreground">No stores match those filters.</p>
+        <EmptyState
+          icon={Building2}
+          title="No stores match those filters"
+          description="Try a different city, or clear the filters to see every store."
+          action={
+            <Link href={`/t/${tenant.slug}/stores`} className={cn(buttonVariants({ size: 'sm' }))}>
+              Clear filters
+            </Link>
+          }
+        />
       )}
 
       <Pagination page={query.page} pageSize={pageSize} total={total} buildHref={buildHref} />

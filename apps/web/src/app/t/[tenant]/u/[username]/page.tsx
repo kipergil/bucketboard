@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { PackageSearch } from 'lucide-react';
 import { getTenantBySlug } from '@/services/tenants';
 import { getPublicProfileByDisplayName } from '@/services/profiles';
 import { ItemCard } from '@/components/item/item-card';
 import { Badge } from '@/components/ui/badge';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface ProfilePageProps {
   params: Promise<{ tenant: string; username: string }>;
@@ -50,7 +52,11 @@ export default async function ProfilePage(props: ProfilePageProps) {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground">No items submitted yet.</p>
+          <EmptyState
+            icon={PackageSearch}
+            title="No items submitted yet"
+            description={`${profile.membership.display_name} hasn't submitted any items yet.`}
+          />
         )}
       </section>
     </div>
