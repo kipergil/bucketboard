@@ -36,3 +36,8 @@ export function assetUrl(
   params.set('quality', String(options.quality ?? 80));
   return `${DIRECTUS_PUBLIC_URL}/assets/${fileId}?${params.toString()}`;
 }
+
+/** Deep-links straight into a collection item's edit view in the Directus admin app. */
+export function directusAdminItemUrl(collection: string, itemId: string): string {
+  return `${DIRECTUS_PUBLIC_URL}/admin/content/${collection}/${itemId}`;
+}
