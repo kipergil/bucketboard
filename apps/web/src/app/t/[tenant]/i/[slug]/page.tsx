@@ -7,12 +7,14 @@ import { getAttributeDefinitionsForCategory, getCategoryById } from '@/services/
 import { listCommentsForItem } from '@/services/comments';
 import { getCurrentDirectusUser } from '@/lib/auth/current-user';
 import { getUserVote } from '@/services/votes';
+import { getMembership } from '@/services/users';
 import { assetUrl } from '@/lib/directus/assets';
 import { VoteButtons } from '@/components/item/vote-buttons';
 import { OfferList } from '@/components/item/offer-list';
 import { AttributeList } from '@/components/item/attribute-list';
 import { CommentThread } from '@/components/item/comment-thread';
 import { ReportButton } from '@/components/item/report-button';
+import { DirectusEditLink } from '@/components/admin/directus-edit-link';
 import {
   CategoryBreadcrumb,
   type BreadcrumbSegment,
@@ -63,6 +65,8 @@ export default async function ItemPage(props: ItemPageProps) {
     ? await getAttributeDefinitionsForCategory(tenant.id, category.id)
     : [];
   const userVote = currentUser ? await getUserVote(item.id, currentUser.id) : null;
+  const membership = currentUser ? await getMembership(tenant.id, currentUser.id) : null;
+  const isAdmin = membership?.role === 'owner' || membership?.role === 'admin';
 
   const segments: BreadcrumbSegment[] = category
     ? category.path.split('/').map((_, index, parts) => {
@@ -115,7 +119,10 @@ export default async function ItemPage(props: ItemPageProps) {
 
           {item.body ? <p className="whitespace-pre-wrap leading-relaxed">{item.body}</p> : null}
 
-          <ReportButton tenantSlug={tenant.slug} targetCollection="items" targetId={item.id} />
+          <div className="flex items-center gap-2">
+            <ReportButton tenantSlug={tenant.slug} targetCollection="items" targetId={item.id} />
+            {isAdmin ? <DirectusEditLink collection="items" itemId={item.id} /> : null}
+          </div>
 
           <section>
             <h2 className="font-heading mb-3 text-lg font-semibold">Where to buy</h2>
