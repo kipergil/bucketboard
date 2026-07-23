@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { getServerEnv } from '@/lib/env';
 import { upsertDirectusUserFromClerk } from '@/services/users';
 import { getServiceDirectusClient } from '@/lib/directus/client';
-import { updateItem, readItems } from '@directus/sdk';
+import { updateUser, readUsers } from '@directus/sdk';
 import { resolveClerkProvider } from '@/lib/auth/provider';
 
 const clerkEmailSchema = z.object({
@@ -93,7 +93,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 async function deactivateUser(clerkUserId: string): Promise<void> {
   const client = getServiceDirectusClient();
   const rows = await client.request(
-    readItems('directus_users', {
+    readUsers({
       filter: { external_identifier: { _eq: clerkUserId } },
       fields: ['id'],
       limit: 1,
@@ -101,7 +101,5 @@ async function deactivateUser(clerkUserId: string): Promise<void> {
   );
   const user = rows[0] as { id: string } | undefined;
   if (!user) return;
-  await client.request(
-    updateItem('directus_users', user.id, { status: 'suspended' }, { fields: ['id'] }),
-  );
+  await client.request(updateUser(user.id, { status: 'suspended' }, { fields: ['id'] }));
 }

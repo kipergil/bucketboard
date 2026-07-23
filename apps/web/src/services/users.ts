@@ -1,5 +1,5 @@
 import 'server-only';
-import { createItem, readItems, updateItem } from '@directus/sdk';
+import { createItem, createUser, readItems, readUsers, updateUser } from '@directus/sdk';
 import type { AuthProvider, DirectusUser, Membership, MembershipRole } from '@bucketboard/shared';
 import { getServiceDirectusClient } from '../lib/directus/client';
 
@@ -38,7 +38,7 @@ export async function upsertDirectusUserFromClerk(
   const client = getServiceDirectusClient();
 
   const byExternalId = await client.request(
-    readItems('directus_users', {
+    readUsers({
       filter: { external_identifier: { _eq: input.clerkUserId } },
       fields: USER_FIELDS,
       limit: 1,
@@ -49,7 +49,7 @@ export async function upsertDirectusUserFromClerk(
     (input.email
       ? ((
           await client.request(
-            readItems('directus_users', {
+            readUsers({
               filter: { email: { _eq: input.email } },
               fields: USER_FIELDS,
               limit: 1,
@@ -69,20 +69,18 @@ export async function upsertDirectusUserFromClerk(
   };
 
   if (existing) {
-    await client.request(updateItem('directus_users', existing.id, payload, { fields: ['id'] }));
+    await client.request(updateUser(existing.id, payload, { fields: ['id'] }));
     return { ...existing, ...payload };
   }
 
-  const created = await client.request(
-    createItem('directus_users', payload, { fields: USER_FIELDS }),
-  );
+  const created = await client.request(createUser(payload, { fields: USER_FIELDS }));
   return created as unknown as DirectusUser;
 }
 
 export async function getDirectusUserByClerkId(clerkUserId: string): Promise<DirectusUser | null> {
   const client = getServiceDirectusClient();
   const rows = await client.request(
-    readItems('directus_users', {
+    readUsers({
       filter: { external_identifier: { _eq: clerkUserId } },
       fields: USER_FIELDS,
       limit: 1,
