@@ -40,11 +40,39 @@ export async function getCurrentDirectusUser(): Promise<DirectusUser | null> {
   });
 }
 
-/** Throws if anonymous — use in server actions that require a signed-in user. */
+/** Thrown by requireCurrentDirectusUser only when the visitor is genuinely anonymous. */
+export class NotSignedInError extends Error {
+  constructor() {
+    super('You must be signed in to do that.');
+    this.name = 'NotSignedInError';
+  }
+}
+
+/**
+ * Throws NotSignedInError if anonymous — use in server actions that require
+ * a signed-in user. Any other failure (Directus unreachable, bad service
+ * credentials, etc.) propagates as-is so callers don't mistake an outage
+ * for "you're not signed in".
+ */
 export async function requireCurrentDirectusUser(): Promise<DirectusUser> {
   const user = await getCurrentDirectusUser();
   if (!user) {
-    throw new Error('You must be signed in to do that.');
+    throw new NotSignedInError();
   }
   return user;
+}
+
+/**
+ * Maps a requireCurrentDirectusUser() failure to a user-facing message.
+ * Only a genuine NotSignedInError gets the sign-in copy — anything else
+ * (bad service credentials, Directus unreachable, etc.) is logged with its
+ * real cause and reported as a generic failure, so an outage doesn't look
+ * like the visitor forgot to sign in.
+ */
+export function authErrorMessage(error: unknown, signedOutMessage: string): string {
+  if (error instanceof NotSignedInError) {
+    return signedOutMessage;
+  }
+  console.error('requireCurrentDirectusUser failed unexpectedly:', error);
+  return 'Something went wrong. Please try again.';
 }

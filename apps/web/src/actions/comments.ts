@@ -2,7 +2,7 @@
 
 import { updateTag } from 'next/cache';
 import { createCommentSchema, editCommentSchema } from '@bucketboard/shared';
-import { requireCurrentDirectusUser } from '@/lib/auth/current-user';
+import { authErrorMessage, requireCurrentDirectusUser } from '@/lib/auth/current-user';
 import { getTenantBySlug } from '@/services/tenants';
 import {
   createComment,
@@ -32,8 +32,8 @@ export async function createCommentAction(
   let user;
   try {
     user = await requireCurrentDirectusUser();
-  } catch {
-    return { ok: false, error: 'Sign in to comment.' };
+  } catch (error) {
+    return { ok: false, error: authErrorMessage(error, 'Sign in to comment.') };
   }
 
   await ensureMembership(
@@ -75,8 +75,8 @@ export async function editCommentAction(input: unknown): Promise<CommentActionRe
   let user;
   try {
     user = await requireCurrentDirectusUser();
-  } catch {
-    return { ok: false, error: 'Sign in required.' };
+  } catch (error) {
+    return { ok: false, error: authErrorMessage(error, 'Sign in required.') };
   }
 
   try {
@@ -92,8 +92,8 @@ export async function deleteCommentAction(commentId: string): Promise<CommentAct
   let user;
   try {
     user = await requireCurrentDirectusUser();
-  } catch {
-    return { ok: false, error: 'Sign in required.' };
+  } catch (error) {
+    return { ok: false, error: authErrorMessage(error, 'Sign in required.') };
   }
 
   try {
