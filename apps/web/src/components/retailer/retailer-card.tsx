@@ -4,6 +4,7 @@ import type { Retailer } from '@bucketboard/shared';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { assetUrl } from '@/lib/directus/assets';
+import { VoteWidget } from '@/components/voting/vote-widget';
 
 export function RetailerCard({ retailer, tenantSlug }: { retailer: Retailer; tenantSlug: string }) {
   const logo = assetUrl(retailer.logo, 'thumb');
@@ -15,7 +16,7 @@ export function RetailerCard({ retailer, tenantSlug }: { retailer: Retailer; ten
           <div className="bg-muted ring-border relative size-12 shrink-0 overflow-hidden rounded-full ring-1">
             {logo ? <Image src={logo} alt="" fill sizes="48px" className="object-cover" /> : null}
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="group-hover:text-primary truncate font-medium transition-colors">
               {retailer.name}
             </p>
@@ -28,6 +29,15 @@ export function RetailerCard({ retailer, tenantSlug }: { retailer: Retailer; ten
               </Badge>
             </div>
           </div>
+          <VoteWidget
+            tenantSlug={tenantSlug}
+            targetCollection="retailers"
+            targetId={retailer.id}
+            initialScore={retailer.vote_score}
+            initialUserVote={null}
+            size="sm"
+            className="shrink-0"
+          />
         </CardContent>
       </Card>
     </Link>

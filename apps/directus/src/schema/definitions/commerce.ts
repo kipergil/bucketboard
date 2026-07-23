@@ -100,6 +100,12 @@ export const retailersCollection: CollectionDefinition = {
     jsonField('default_affiliate_params'),
     booleanField('nofollow', true),
     statusField(RETAILER_STATUS, 'draft'),
+    integerField('vote_score', {
+      defaultValue: 0,
+      note: 'Denormalised, maintained by the vote-counter Flow.',
+    }),
+    integerField('votes_up', { defaultValue: 0 }),
+    integerField('votes_down', { defaultValue: 0 }),
     sortField(),
     ...systemTrackingFields(),
   ],

@@ -49,8 +49,10 @@ function sortWindowFilter(sort: ItemSort): Record<string, unknown> | null {
   return null;
 }
 
-function sortField(sort: ItemSort): '-date_created' | '-vote_score' {
+function sortField(sort: ItemSort): '-date_created' | '-vote_score' | 'title' | '-title' {
   if (sort === 'new') return '-date_created';
+  if (sort === 'name_asc') return 'title';
+  if (sort === 'name_desc') return '-title';
   return '-vote_score';
 }
 

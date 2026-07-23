@@ -36,8 +36,10 @@ const statements: string[] = [
   // item_attributes: one value per (item, definition)
   `CREATE UNIQUE INDEX IF NOT EXISTS item_attributes_item_definition_uidx ON item_attributes (item, definition)`,
 
-  // votes: one vote per (item, user)
-  `CREATE UNIQUE INDEX IF NOT EXISTS votes_item_user_uidx ON votes (item, "user")`,
+  // votes: one vote per (target, user) — target_collection+target_id is the
+  // polymorphic target (an item or a retailer), so this alone is unique
+  // regardless of which tenant the vote was cast from.
+  `CREATE UNIQUE INDEX IF NOT EXISTS votes_target_user_uidx ON votes (target_collection, target_id, "user")`,
 
   // retailer_tenant_settings: one row per (tenant, retailer)
   `CREATE UNIQUE INDEX IF NOT EXISTS retailer_tenant_settings_tenant_retailer_uidx ON retailer_tenant_settings (tenant, retailer)`,

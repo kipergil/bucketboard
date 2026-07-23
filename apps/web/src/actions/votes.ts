@@ -43,9 +43,15 @@ export async function castVoteAction(
     [user.first_name, user.last_name].filter(Boolean).join(' ') || null,
   );
 
-  const result = await castVote(tenant.id, parsed.data.itemId, user.id, parsed.data.value);
+  const result = await castVote(
+    tenant.id,
+    parsed.data.targetCollection,
+    parsed.data.targetId,
+    user.id,
+    parsed.data.value,
+  );
 
-  updateTag(`items:${tenant.id}`);
+  updateTag(parsed.data.targetCollection === 'items' ? `items:${tenant.id}` : 'retailers');
 
   return {
     ok: true,

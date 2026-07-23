@@ -4,7 +4,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 export function ItemCardSkeleton() {
   return (
     <Card className="overflow-hidden py-0">
-      <div className="bg-muted aspect-4/3 w-full" />
+      <div className="bg-muted aspect-4/3 relative w-full">
+        <Skeleton className="absolute left-2 top-2 h-12 w-8 rounded-lg" />
+      </div>
       <CardContent className="space-y-2 p-3.5">
         <Skeleton className="h-4 w-4/5" />
         <Skeleton className="h-3 w-2/5" />

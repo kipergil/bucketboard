@@ -28,17 +28,28 @@ function normalizeIdOperation(resolve: string): OperationDefinition {
 }
 
 /**
- * Recomputes items.votes_up / votes_down / vote_score from the votes table
- * itself whenever a vote is cast or flipped — a self-healing safety net on
- * top of the app's own atomic delta update (packages/shared's toggleVote).
- * Un-voting (a hard DELETE) isn't covered here: Directus's post-commit
- * delete event doesn't retain the deleted row's `item` FK, so that case is
- * handled transactionally by the server action instead.
+ * Recomputes votes_up/votes_down/vote_score on the voted-on row (an item
+ * OR a retailer — `votes.target_collection`/`target_id` is a polymorphic
+ * reference, not an m2o) from the votes table itself whenever a vote is
+ * cast or flipped — a self-healing safety net on top of the app's own
+ * atomic delta update (packages/shared's toggleVote). Un-voting (a hard
+ * DELETE) isn't covered here: Directus's post-commit delete event doesn't
+ * retain the deleted row's target fields, so that case is handled
+ * transactionally by the server action instead.
+ *
+ * A single Condition operation forks the chain into an items branch and a
+ * retailers branch (each ending in its own item-update, since Directus's
+ * item-update operation needs a static `collection` — it can't be
+ * templated per-row). The fork can't reference `read_vote.0.target_collection`
+ * directly: Directus Condition filters cannot index into an array result
+ * (confirmed via the Directus community — https://github.com/directus/directus/discussions/16652),
+ * so `extract_target` first flattens the single-row array into plain
+ * top-level fields the condition can actually reference.
  */
 export const voteCounterFlow: FlowDefinition = {
   name: 'Vote Counter Sync',
   icon: 'thumbs_up_down',
-  description: 'Recomputes items.votes_up/votes_down/vote_score from the votes table.',
+  description: 'Recomputes votes_up/votes_down/vote_score on the voted-on item or retailer.',
   trigger: { type: 'event', scope: ['items.create', 'items.update'], collections: ['votes'] },
   operations: [
     normalizeIdOperation('read_vote'),
@@ -49,33 +60,66 @@ export const voteCounterFlow: FlowDefinition = {
       options: {
         collection: 'votes',
         permissions: '$full',
-        query: { filter: { id: { _eq: '{{normalize_id.id}}' } }, fields: ['item'] },
+        query: {
+          filter: { id: { _eq: '{{normalize_id.id}}' } },
+          fields: ['target_collection', 'target_id'],
+        },
       },
-      resolve: 'aggregate_votes',
+      resolve: 'extract_target',
     },
     {
-      key: 'aggregate_votes',
+      key: 'extract_target',
+      name: 'Flatten target_collection/target_id',
+      type: 'exec',
+      options: {
+        code: [
+          'module.exports = async function (data) {',
+          '  const vote = Array.isArray(data.read_vote) ? data.read_vote[0] : null;',
+          '  return {',
+          '    target_collection: vote ? vote.target_collection : null,',
+          '    target_id: vote ? vote.target_id : null,',
+          '  };',
+          '};',
+        ].join('\n'),
+      },
+      resolve: 'check_is_item',
+    },
+    {
+      key: 'check_is_item',
+      name: 'Branch on target_collection',
+      type: 'condition',
+      options: {
+        filter: { $last: { target_collection: { _eq: 'items' } } },
+      },
+      resolve: 'aggregate_item_votes',
+      reject: 'aggregate_retailer_votes',
+    },
+    {
+      key: 'aggregate_item_votes',
       name: 'Aggregate votes for item',
       type: 'item-read',
       options: {
         collection: 'votes',
         permissions: '$full',
         query: {
-          filter: { item: { _eq: '{{read_vote.0.item}}' } },
+          filter: {
+            target_collection: { _eq: 'items' },
+            target_id: { _eq: '{{extract_target.target_id}}' },
+          },
           aggregate: { count: '*' },
           groupBy: ['value'],
         },
       },
-      resolve: 'compute_counts',
+      resolve: 'compute_item_counts',
     },
     {
-      key: 'compute_counts',
-      name: 'Compute up/down/score',
+      key: 'compute_item_counts',
+      name: 'Compute item up/down/score',
       type: 'exec',
       options: {
         code: [
           'module.exports = async function (data) {',
-          '  const rows = Array.isArray(data.aggregate_votes) ? data.aggregate_votes : [];',
+          '  const rows = Array.isArray(data.aggregate_item_votes) ? data.aggregate_item_votes : [];',
           '  let up = 0;',
           '  let down = 0;',
           '  for (const row of rows) {',
@@ -88,15 +132,67 @@ export const voteCounterFlow: FlowDefinition = {
           '};',
         ].join('\n'),
       },
-      resolve: 'update_item',
+      resolve: 'update_item_counters',
     },
     {
-      key: 'update_item',
+      key: 'update_item_counters',
       name: 'Update item counters',
       type: 'item-update',
       options: {
         collection: 'items',
-        key: ['{{read_vote.0.item}}'],
+        key: ['{{extract_target.target_id}}'],
+        payload: '{{$last}}',
+        permissions: '$full',
+        emitEvents: false,
+      },
+    },
+    {
+      key: 'aggregate_retailer_votes',
+      name: 'Aggregate votes for retailer',
+      type: 'item-read',
+      options: {
+        collection: 'votes',
+        permissions: '$full',
+        query: {
+          filter: {
+            target_collection: { _eq: 'retailers' },
+            target_id: { _eq: '{{extract_target.target_id}}' },
+          },
+          aggregate: { count: '*' },
+          groupBy: ['value'],
+        },
+      },
+      resolve: 'compute_retailer_counts',
+    },
+    {
+      key: 'compute_retailer_counts',
+      name: 'Compute retailer up/down/score',
+      type: 'exec',
+      options: {
+        code: [
+          'module.exports = async function (data) {',
+          '  const rows = Array.isArray(data.aggregate_retailer_votes) ? data.aggregate_retailer_votes : [];',
+          '  let up = 0;',
+          '  let down = 0;',
+          '  for (const row of rows) {',
+          '    const value = Number(row.value);',
+          '    const count = Number(row.count ?? 0);',
+          '    if (value === 1) up = count;',
+          '    if (value === -1) down = count;',
+          '  }',
+          '  return { votes_up: up, votes_down: down, vote_score: up - down };',
+          '};',
+        ].join('\n'),
+      },
+      resolve: 'update_retailer_counters',
+    },
+    {
+      key: 'update_retailer_counters',
+      name: 'Update retailer counters',
+      type: 'item-update',
+      options: {
+        collection: 'retailers',
+        key: ['{{extract_target.target_id}}'],
         payload: '{{$last}}',
         permissions: '$full',
         emitEvents: false,

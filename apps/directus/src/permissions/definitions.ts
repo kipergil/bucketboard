@@ -102,6 +102,7 @@ export const servicePolicy: PolicyDefinition = {
     { collection: 'reports', action: 'create' },
     { collection: 'reports', action: 'read' },
     { collection: 'retailers', action: 'read' },
+    { collection: 'retailers', action: 'update' },
     { collection: 'retailer_tenant_settings', action: 'read' },
     { collection: 'affiliate_programs', action: 'read' },
     { collection: 'item_offers', action: 'create' },

@@ -4,6 +4,7 @@ import type {
   AffiliateProgram,
   Retailer,
   RetailerLocation,
+  RetailerSort,
   RetailerTenantSettings,
 } from '@bucketboard/shared';
 import { getPublicDirectusClient, getServiceDirectusClient } from '../lib/directus/client';
@@ -25,13 +26,33 @@ const RETAILER_FIELDS = [
   'nofollow',
   'status',
   'sort',
+  'vote_score',
+  'votes_up',
+  'votes_down',
+  'date_created',
 ] as const;
+
+function retailerSortFields(
+  sort: RetailerSort,
+): Array<'-vote_score' | 'name' | '-date_created' | '-name'> {
+  switch (sort) {
+    case 'votes':
+      return ['-vote_score', 'name'];
+    case 'new':
+      return ['-date_created'];
+    case 'name_asc':
+      return ['name'];
+    case 'name_desc':
+      return ['-name'];
+  }
+}
 
 export interface ListRetailersOptions {
   type?: string;
   kind?: string;
   tagSlug?: string;
   country?: string;
+  sort?: RetailerSort;
   page?: number;
   pageSize?: number;
 }
@@ -42,6 +63,7 @@ export async function listRetailers(
   const client = getPublicDirectusClient();
   const page = options.page ?? 1;
   const pageSize = options.pageSize ?? 24;
+  const sort = options.sort ?? 'votes';
 
   const filter: Record<string, unknown> = { status: { _eq: 'published' } };
   if (options.type) filter.type = { _eq: options.type };
@@ -55,7 +77,7 @@ export async function listRetailers(
         readItems('retailers', {
           filter,
           fields: RETAILER_FIELDS,
-          sort: ['sort', 'name'],
+          sort: retailerSortFields(sort),
           page,
           limit: pageSize,
         }),
