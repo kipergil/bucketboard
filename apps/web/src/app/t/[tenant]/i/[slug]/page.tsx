@@ -9,7 +9,7 @@ import { getCurrentDirectusUser } from '@/lib/auth/current-user';
 import { getUserVote } from '@/services/votes';
 import { getMembership } from '@/services/users';
 import { assetUrl } from '@/lib/directus/assets';
-import { VoteButtons } from '@/components/item/vote-buttons';
+import { VoteWidget } from '@/components/voting/vote-widget';
 import { OfferList } from '@/components/item/offer-list';
 import { AttributeList } from '@/components/item/attribute-list';
 import { CommentThread } from '@/components/item/comment-thread';
@@ -64,7 +64,7 @@ export default async function ItemPage(props: ItemPageProps) {
   const definitions = category
     ? await getAttributeDefinitionsForCategory(tenant.id, category.id)
     : [];
-  const userVote = currentUser ? await getUserVote(item.id, currentUser.id) : null;
+  const userVote = currentUser ? await getUserVote('items', item.id, currentUser.id) : null;
   const membership = currentUser ? await getMembership(tenant.id, currentUser.id) : null;
   const isAdmin = membership?.role === 'owner' || membership?.role === 'admin';
 
@@ -90,9 +90,10 @@ export default async function ItemPage(props: ItemPageProps) {
       <CategoryBreadcrumb tenantSlug={tenant.slug} segments={segments} />
 
       <div className="grid gap-6 md:grid-cols-[auto_1fr]">
-        <VoteButtons
+        <VoteWidget
           tenantSlug={tenant.slug}
-          itemId={item.id}
+          targetCollection="items"
+          targetId={item.id}
           initialScore={item.vote_score}
           initialUserVote={userVote}
         />

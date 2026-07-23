@@ -32,6 +32,9 @@ export type AttributeType = (typeof ATTRIBUTE_TYPE)[number];
 export const VOTE_VALUE = [1, -1] as const;
 export type VoteValue = (typeof VOTE_VALUE)[number];
 
+export const VOTE_TARGET_COLLECTION = ['items', 'retailers'] as const;
+export type VoteTargetCollection = (typeof VOTE_TARGET_COLLECTION)[number];
+
 export const COMMENT_STATUS = ['published', 'hidden', 'removed'] as const;
 export type CommentStatus = (typeof COMMENT_STATUS)[number];
 

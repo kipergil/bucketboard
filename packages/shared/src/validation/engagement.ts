@@ -1,9 +1,15 @@
 import { z } from 'zod';
 import { uuidSchema } from './common';
-import { REPORT_REASON, REPORT_TARGET_COLLECTION, VOTE_VALUE } from '../enums';
+import {
+  REPORT_REASON,
+  REPORT_TARGET_COLLECTION,
+  VOTE_TARGET_COLLECTION,
+  VOTE_VALUE,
+} from '../enums';
 
 export const castVoteSchema = z.object({
-  itemId: uuidSchema,
+  targetCollection: z.enum(VOTE_TARGET_COLLECTION),
+  targetId: uuidSchema,
   value: z.union([z.literal(VOTE_VALUE[0]), z.literal(VOTE_VALUE[1])]),
 });
 export type CastVoteInput = z.infer<typeof castVoteSchema>;

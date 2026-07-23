@@ -1,7 +1,17 @@
 import { z } from 'zod';
 
-export const itemSortSchema = z.enum(['top_all', 'top_month', 'top_week', 'new']);
+export const itemSortSchema = z.enum([
+  'top_all',
+  'top_month',
+  'top_week',
+  'new',
+  'name_asc',
+  'name_desc',
+]);
 export type ItemSort = z.infer<typeof itemSortSchema>;
+
+export const retailerSortSchema = z.enum(['votes', 'new', 'name_asc', 'name_desc']);
+export type RetailerSort = z.infer<typeof retailerSortSchema>;
 
 export const categoryFacetFilterSchema = z.record(
   z.string(),
@@ -37,6 +47,7 @@ export const retailerDirectoryQuerySchema = z.object({
   kind: z.string().optional(),
   tag: z.string().optional(),
   country: z.string().optional(),
+  sort: retailerSortSchema.default('votes'),
   page: z.coerce.number().int().min(1).default(1),
 });
 export type RetailerDirectoryQuery = z.infer<typeof retailerDirectoryQuerySchema>;

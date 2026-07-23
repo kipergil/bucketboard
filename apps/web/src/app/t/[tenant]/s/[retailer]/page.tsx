@@ -6,6 +6,8 @@ import { ExternalLink, PackageSearch } from 'lucide-react';
 import { getTenantBySlug } from '@/services/tenants';
 import { getRetailerBySlug, listRetailerLocations } from '@/services/retailers';
 import { listItemsForRetailer } from '@/services/items';
+import { getCurrentDirectusUser } from '@/lib/auth/current-user';
+import { getUserVote } from '@/services/votes';
 import { assetUrl } from '@/lib/directus/assets';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +15,7 @@ import { ItemCard } from '@/components/item/item-card';
 import { Pagination } from '@/components/pagination';
 import { RetailerJsonLd } from '@/components/seo/json-ld';
 import { EmptyState } from '@/components/ui/empty-state';
+import { VoteWidget } from '@/components/voting/vote-widget';
 
 interface RetailerPageProps {
   params: Promise<{ tenant: string; retailer: string }>;
@@ -40,10 +43,12 @@ export default async function RetailerPage(props: RetailerPageProps) {
   if (!loaded) notFound();
   const { tenant, retailer, categoryPath, page } = loaded;
 
-  const [locations, { items, total, pageSize }] = await Promise.all([
+  const [locations, { items, total, pageSize }, currentUser] = await Promise.all([
     listRetailerLocations(retailer.id),
     listItemsForRetailer(retailer.id, { categoryPath, page }),
+    getCurrentDirectusUser(),
   ]);
+  const userVote = currentUser ? await getUserVote('retailers', retailer.id, currentUser.id) : null;
 
   const logo = assetUrl(retailer.logo, 'thumb');
   const cover = assetUrl(retailer.cover, 'cover');
@@ -68,6 +73,13 @@ export default async function RetailerPage(props: RetailerPageProps) {
 
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
+          <VoteWidget
+            tenantSlug={tenant.slug}
+            targetCollection="retailers"
+            targetId={retailer.id}
+            initialScore={retailer.vote_score}
+            initialUserVote={userVote}
+          />
           {logo ? (
             <div className="bg-muted relative size-16 shrink-0 overflow-hidden rounded-full">
               <Image src={logo} alt="" fill sizes="64px" className="object-cover" />

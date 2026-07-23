@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowBigUp, MessageSquare, Store } from 'lucide-react';
+import { MessageSquare, Store } from 'lucide-react';
 import type { Item } from '@bucketboard/shared';
 import { Card, CardContent } from '@/components/ui/card';
 import { assetUrl } from '@/lib/directus/assets';
+import { VoteWidget } from '@/components/voting/vote-widget';
 
 export function ItemCard({ item, tenantSlug }: { item: Item; tenantSlug: string }) {
   const image = assetUrl(item.image, 'card');
@@ -21,6 +22,15 @@ export function ItemCard({ item, tenantSlug }: { item: Item; tenantSlug: string 
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : null}
+          <VoteWidget
+            tenantSlug={tenantSlug}
+            targetCollection="items"
+            targetId={item.id}
+            initialScore={item.vote_score}
+            initialUserVote={null}
+            size="sm"
+            className="bg-background/90 absolute left-2 top-2 z-10 shadow-sm backdrop-blur-sm"
+          />
         </div>
         <CardContent className="space-y-1.5 p-3.5">
           <h3 className="group-hover:text-primary line-clamp-2 font-medium leading-snug transition-colors">
@@ -28,10 +38,6 @@ export function ItemCard({ item, tenantSlug }: { item: Item; tenantSlug: string 
           </h3>
           {item.brand ? <p className="text-muted-foreground text-sm">{item.brand}</p> : null}
           <div className="text-muted-foreground flex items-center gap-3 pt-1 text-xs">
-            <span className="flex items-center gap-1">
-              <ArrowBigUp className="size-3.5" aria-hidden="true" />
-              {item.vote_score}
-            </span>
             <span className="flex items-center gap-1">
               <MessageSquare className="size-3.5" aria-hidden="true" />
               {item.comment_count}

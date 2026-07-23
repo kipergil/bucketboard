@@ -1,6 +1,6 @@
 import 'server-only';
 import { createItem, deleteItem, readItems, updateItem } from '@directus/sdk';
-import { toggleVote, type VoteValue } from '@bucketboard/shared';
+import { toggleVote, type VoteTargetCollection, type VoteValue } from '@bucketboard/shared';
 import { getServiceDirectusClient } from '../lib/directus/client';
 
 export interface CastVoteResult {
@@ -11,15 +11,16 @@ export interface CastVoteResult {
 }
 
 /**
- * Casts/flips/removes a vote and atomically applies the resulting delta to
- * the item's denormalised counters, using the tested toggleVote() pure
- * function. The "Vote Counter Sync" Directus Flow re-derives the same
- * counters from the votes table as a self-healing safety net — this is
- * the fast path that makes the UI feel instant.
+ * Casts/flips/removes a vote on an item or a retailer and atomically
+ * applies the resulting delta to the target's denormalised counters, using
+ * the tested toggleVote() pure function. The "Vote Counter Sync" Directus
+ * Flow re-derives the same counters from the votes table as a self-healing
+ * safety net — this is the fast path that makes the UI feel instant.
  */
 export async function castVote(
   tenantId: string,
-  itemId: string,
+  targetCollection: VoteTargetCollection,
+  targetId: string,
   userId: string,
   requestedValue: VoteValue,
 ): Promise<CastVoteResult> {
@@ -27,7 +28,11 @@ export async function castVote(
 
   const existing = await client.request(
     readItems('votes', {
-      filter: { item: { _eq: itemId }, user: { _eq: userId } },
+      filter: {
+        target_collection: { _eq: targetCollection },
+        target_id: { _eq: targetId },
+        user: { _eq: userId },
+      },
       fields: ['id', 'value'],
       limit: 1,
     }),
@@ -40,7 +45,13 @@ export async function castVote(
     await client.request(
       createItem(
         'votes',
-        { tenant: tenantId, item: itemId, user: userId, value: requestedValue },
+        {
+          tenant: tenantId,
+          target_collection: targetCollection,
+          target_id: targetId,
+          user: userId,
+          value: requestedValue,
+        },
         { fields: ['id'] },
       ),
     );
@@ -52,19 +63,19 @@ export async function castVote(
     await client.request(deleteItem('votes', existingVote.id));
   }
 
-  const items = await client.request(
-    readItems('items', {
-      filter: { id: { _eq: itemId } },
+  const rows = await client.request(
+    readItems(targetCollection, {
+      filter: { id: { _eq: targetId } },
       fields: ['vote_score', 'votes_up', 'votes_down'],
       limit: 1,
     }),
   );
   // Read-then-write isn't atomic — a concurrent second vote on the same
-  // item could interleave here. Acceptable: the "Vote Counter Sync" Flow
+  // target could interleave here. Acceptable: the "Vote Counter Sync" Flow
   // (apps/directus/src/flows/definitions.ts) independently recomputes
   // these same counters from a full aggregate of the votes table on every
   // create/update, self-healing any drift shortly after.
-  const current = items[0] as
+  const current = rows[0] as
     { vote_score: number; votes_up: number; votes_down: number } | undefined;
   const voteScore = (current?.vote_score ?? 0) + result.scoreDelta;
   const votesUp = (current?.votes_up ?? 0) + result.votesUpDelta;
@@ -72,8 +83,8 @@ export async function castVote(
 
   await client.request(
     updateItem(
-      'items',
-      itemId,
+      targetCollection,
+      targetId,
       { vote_score: voteScore, votes_up: votesUp, votes_down: votesDown },
       { fields: ['id'] },
     ),
@@ -82,11 +93,19 @@ export async function castVote(
   return { nextValue: result.nextValue, voteScore, votesUp, votesDown };
 }
 
-export async function getUserVote(itemId: string, userId: string): Promise<VoteValue | null> {
+export async function getUserVote(
+  targetCollection: VoteTargetCollection,
+  targetId: string,
+  userId: string,
+): Promise<VoteValue | null> {
   const client = getServiceDirectusClient();
   const rows = await client.request(
     readItems('votes', {
-      filter: { item: { _eq: itemId }, user: { _eq: userId } },
+      filter: {
+        target_collection: { _eq: targetCollection },
+        target_id: { _eq: targetId },
+        user: { _eq: userId },
+      },
       fields: ['value'],
       limit: 1,
     }),

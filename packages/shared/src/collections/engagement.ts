@@ -3,6 +3,7 @@ import type {
   ReportReason,
   ReportStatus,
   ReportTargetCollection,
+  VoteTargetCollection,
   VoteValue,
 } from '../enums';
 import type { Relation, SystemFields } from './base';
@@ -12,7 +13,8 @@ import type { DirectusUser } from './users';
 
 export interface Vote extends SystemFields {
   tenant: Relation<Tenant>;
-  item: Relation<Item>;
+  target_collection: VoteTargetCollection;
+  target_id: string;
   user: Relation<DirectusUser>;
   value: VoteValue;
 }

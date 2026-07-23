@@ -10,6 +10,7 @@ export function RetailerCardSkeleton() {
           <Skeleton className="h-4 w-3/4" />
           <Skeleton className="h-4 w-1/2" />
         </div>
+        <Skeleton className="h-12 w-8 shrink-0 rounded-lg" />
       </CardContent>
     </Card>
   );

@@ -5,6 +5,7 @@ import { getTenantBySlug } from '@/services/tenants';
 import { listRetailers } from '@/services/retailers';
 import { retailerDirectoryQuerySchema, RETAILER_TYPE, RETAILER_KIND } from '@bucketboard/shared';
 import { RetailerCard } from '@/components/retailer/retailer-card';
+import { RetailerSortToolbar } from '@/components/retailer/retailer-sort-toolbar';
 import { Pagination } from '@/components/pagination';
 import { buttonVariants } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -30,6 +31,7 @@ export default async function ShopsDirectoryPage({
     kind: query.kind,
     tagSlug: query.tag,
     country: query.country,
+    sort: query.sort,
     page: query.page,
   });
 
@@ -41,6 +43,7 @@ export default async function ShopsDirectoryPage({
     if (query.kind) params.set('kind', query.kind);
     if (query.tag) params.set('tag', query.tag);
     if (query.country) params.set('country', query.country);
+    if (query.sort !== 'votes') params.set('sort', query.sort);
     if (page > 1) params.set('page', String(page));
     const qs = params.toString();
     return `/t/${tenantSlug}/shops${qs ? `?${qs}` : ''}`;
@@ -89,7 +92,10 @@ export default async function ShopsDirectoryPage({
         </button>
       </form>
 
-      <p className="text-muted-foreground text-sm">{total} shops</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-muted-foreground text-sm">{total} shops</p>
+        <RetailerSortToolbar currentSort={query.sort} />
+      </div>
 
       {retailers.length > 0 ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

@@ -53,6 +53,9 @@ export interface Retailer extends SystemFields {
   nofollow: boolean;
   status: RetailerStatus;
   sort: number | null;
+  vote_score: number;
+  votes_up: number;
+  votes_down: number;
 }
 
 export interface RetailerTenantSettings extends SystemFields {

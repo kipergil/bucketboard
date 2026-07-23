@@ -3,6 +3,7 @@ import {
   REPORT_REASON,
   REPORT_STATUS,
   REPORT_TARGET_COLLECTION,
+  VOTE_TARGET_COLLECTION,
 } from '@bucketboard/shared';
 import type { CollectionDefinition } from '../types.js';
 import {
@@ -16,20 +17,20 @@ import {
 } from '../presets.js';
 
 const votesTenant = m2o('votes', 'tenant', 'tenants', { required: true, nullable: false });
-const votesItem = m2o('votes', 'item', 'items', {
-  required: true,
-  nullable: false,
-  oneField: 'votes',
-});
 const votesUser = m2o('votes', 'user', 'directus_users', { required: true, nullable: false });
 
 export const votesCollection: CollectionDefinition = {
   collection: 'votes',
   icon: 'thumbs_up_down',
-  note: 'One vote per (item, user). Re-voting the same value removes it; the opposite flips it.',
-  displayTemplate: '{{item}} — {{value}}',
+  note: 'One vote per (target, user). Re-voting the same value removes it; the opposite flips it. Polymorphic target (items or retailers) rather than an m2o, so the same collection covers both without duplicating vote logic.',
+  displayTemplate: '{{target_collection}} #{{target_id}} — {{value}}',
   fields: [
     idField(),
+    selectField('target_collection', VOTE_TARGET_COLLECTION, { nullable: false }),
+    textField('target_id', {
+      required: true,
+      note: 'Primary key of the voted-on item or retailer.',
+    }),
     {
       field: 'value',
       type: 'integer',
@@ -48,7 +49,7 @@ export const votesCollection: CollectionDefinition = {
     },
     ...systemTrackingFields(),
   ],
-  relationFields: [votesTenant, votesItem, votesUser],
+  relationFields: [votesTenant, votesUser],
 };
 
 const commentsTenant = m2o('comments', 'tenant', 'tenants', { required: true, nullable: false });
