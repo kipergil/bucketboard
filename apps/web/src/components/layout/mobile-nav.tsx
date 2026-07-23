@@ -7,13 +7,16 @@ import { Menu, X, Store, Building2, Info, ShieldCheck, PlusCircle } from 'lucide
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from './search-bar';
+import { SHOW_AFFILIATE_DISCLOSURE } from '@/lib/featureFlags';
 import type { TenantContextValue } from '@/lib/tenant/context';
 
 const NAV_LINKS = [
   { href: '/shops', label: 'Shops', icon: Store },
   { href: '/stores', label: 'Stores', icon: Building2 },
   { href: '/about', label: 'About', icon: Info },
-  { href: '/affiliate-disclosure', label: 'Affiliate disclosure', icon: ShieldCheck },
+  ...(SHOW_AFFILIATE_DISCLOSURE
+    ? [{ href: '/affiliate-disclosure', label: 'Affiliate disclosure', icon: ShieldCheck }]
+    : []),
 ];
 
 /**
