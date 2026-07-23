@@ -1,7 +1,7 @@
 'use server';
 
 import { createReportSchema } from '@bucketboard/shared';
-import { requireCurrentDirectusUser } from '@/lib/auth/current-user';
+import { authErrorMessage, requireCurrentDirectusUser } from '@/lib/auth/current-user';
 import { getTenantBySlug } from '@/services/tenants';
 import { createReport } from '@/services/reports';
 
@@ -25,8 +25,8 @@ export async function createReportAction(
   let user;
   try {
     user = await requireCurrentDirectusUser();
-  } catch {
-    return { ok: false, error: 'Sign in to report content.' };
+  } catch (error) {
+    return { ok: false, error: authErrorMessage(error, 'Sign in to report content.') };
   }
 
   await createReport({

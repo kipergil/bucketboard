@@ -6,7 +6,7 @@ import {
   quickAddExtractionSchema,
   type QuickAddExtraction,
 } from '@bucketboard/shared';
-import { requireCurrentDirectusUser } from '@/lib/auth/current-user';
+import { authErrorMessage, requireCurrentDirectusUser } from '@/lib/auth/current-user';
 import { getServerEnv } from '@/lib/env';
 import { importImageFromUrl } from '@/services/files';
 
@@ -54,8 +54,8 @@ const QUICK_ADD_OUTPUT_SCHEMA = {
 export async function quickAddParseAction(rawText: unknown): Promise<QuickAddParseActionResult> {
   try {
     await requireCurrentDirectusUser();
-  } catch {
-    return { ok: false, error: 'Sign in to use quick add.' };
+  } catch (error) {
+    return { ok: false, error: authErrorMessage(error, 'Sign in to use quick add.') };
   }
 
   const parsedInput = quickAddInputSchema.safeParse({ text: rawText });
@@ -148,8 +148,8 @@ export async function importQuickAddImageAction(
 ): Promise<QuickAddImageActionResult> {
   try {
     await requireCurrentDirectusUser();
-  } catch {
-    return { ok: false, error: 'Sign in to use quick add.' };
+  } catch (error) {
+    return { ok: false, error: authErrorMessage(error, 'Sign in to use quick add.') };
   }
 
   if (typeof imageUrl !== 'string' || !URL_PATTERN.test(imageUrl)) {

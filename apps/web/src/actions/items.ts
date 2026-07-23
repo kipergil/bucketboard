@@ -2,7 +2,7 @@
 
 import { updateTag } from 'next/cache';
 import { submitItemSchema } from '@bucketboard/shared';
-import { requireCurrentDirectusUser } from '@/lib/auth/current-user';
+import { authErrorMessage, requireCurrentDirectusUser } from '@/lib/auth/current-user';
 import { getTenantBySlug } from '@/services/tenants';
 import { createSubmittedItem } from '@/services/items';
 import { createPendingItemOffer } from '@/services/offers';
@@ -39,8 +39,8 @@ export async function submitItemAction(
   let user;
   try {
     user = await requireCurrentDirectusUser();
-  } catch {
-    return { ok: false, error: 'Sign in to submit an item.' };
+  } catch (error) {
+    return { ok: false, error: authErrorMessage(error, 'Sign in to submit an item.') };
   }
 
   await ensureMembership(
@@ -94,8 +94,8 @@ export interface UploadImageActionResult {
 export async function uploadItemImageAction(formData: FormData): Promise<UploadImageActionResult> {
   try {
     await requireCurrentDirectusUser();
-  } catch {
-    return { ok: false, error: 'Sign in to upload images.' };
+  } catch (error) {
+    return { ok: false, error: authErrorMessage(error, 'Sign in to upload images.') };
   }
 
   const file = formData.get('file');

@@ -2,7 +2,7 @@
 
 import { updateTag } from 'next/cache';
 import { castVoteSchema } from '@bucketboard/shared';
-import { requireCurrentDirectusUser } from '@/lib/auth/current-user';
+import { authErrorMessage, requireCurrentDirectusUser } from '@/lib/auth/current-user';
 import { getTenantBySlug } from '@/services/tenants';
 import { castVote } from '@/services/votes';
 import { ensureMembership } from '@/services/users';
@@ -33,8 +33,8 @@ export async function castVoteAction(
   let user;
   try {
     user = await requireCurrentDirectusUser();
-  } catch {
-    return { ok: false, error: 'Sign in to vote.' };
+  } catch (error) {
+    return { ok: false, error: authErrorMessage(error, 'Sign in to vote.') };
   }
 
   await ensureMembership(
