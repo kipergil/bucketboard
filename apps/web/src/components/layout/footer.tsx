@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SHOW_AFFILIATE_DISCLOSURE } from '@/lib/featureFlags';
 import type { TenantContextValue } from '@/lib/tenant/context';
 
 export function Footer({ tenant }: { tenant: TenantContextValue }) {
@@ -27,12 +28,14 @@ export function Footer({ tenant }: { tenant: TenantContextValue }) {
             <Link href={`${base}/about`} className="hover:text-foreground transition-colors">
               About
             </Link>
-            <Link
-              href={`${base}/affiliate-disclosure`}
-              className="hover:text-foreground transition-colors"
-            >
-              Affiliate disclosure
-            </Link>
+            {SHOW_AFFILIATE_DISCLOSURE ? (
+              <Link
+                href={`${base}/affiliate-disclosure`}
+                className="hover:text-foreground transition-colors"
+              >
+                Affiliate disclosure
+              </Link>
+            ) : null}
           </nav>
         </div>
         <p className="text-muted-foreground border-t pt-4 text-xs">
